@@ -138,6 +138,11 @@ class _TableManagerWriter {
         leaf: leaf,
         dbClassName: dbClassName,
         columnOrderings: columnOrderings));
+    leaf.write(_templates.rowClassWithReferences(
+        currentTable: table,
+        relations: relations,
+        leaf: leaf,
+        dbClassName: dbClassName));
   }
 }
 

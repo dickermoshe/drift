@@ -114,6 +114,13 @@ class _ManagerCodeTemplates {
     return '\$${table.entityInfoName}UpdateCompanionBuilder';
   }
 
+  /// Name of the typedef for the update companion builder for a table
+  ///
+  /// This is the name of the typedef of a function that updates rows in the table
+  String rowClassWithReferencesName(DriftTable table) {
+    return '\$${table.entityInfoName}WithReferences';
+  }
+
   /// Build the builder for a companion class
   /// This is used to build the insert and update companions
   /// Returns a tuple with the typedef and the builder
@@ -190,7 +197,8 @@ class _ManagerCodeTemplates {
     ${orderingComposerNameWithPrefix(table, leaf)},
     ${processedTableManagerName(table)},
     ${insertCompanionBuilderTypeDef(table)},
-    ${updateCompanionBuilderTypeDefName(table)}>""";
+    ${updateCompanionBuilderTypeDefName(table)},
+    ${rowClassWithReferencesName(table)}>""";
   }
 
   /// Code for getting a table from inside a composer
@@ -223,6 +231,7 @@ class _ManagerCodeTemplates {
         orderingComposer: ${orderingComposerNameWithPrefix(table, leaf)}(${leaf.drift("ComposerState")}(db, table)),
         getChildManagerBuilder: (p) => ${processedTableManagerName(table)}(p),
         getUpdateCompanionBuilder: $updateCompanionBuilder,
+        withReferences: (p0)  async => p0.map((e) => ${rowClassWithReferencesName(table)}(db,e)).toList() ,
         getInsertCompanionBuilder:$insertCompanionBuilder,));
         }
     """;
@@ -368,5 +377,41 @@ class _ManagerCodeTemplates {
           \$state.db, ${_referenceTableFromComposer(relation.referencedTable, leaf)}, joinBuilder, parentComposers
         ))
               );""";
+  }
+
+  /// Code for a row class which contains references to other tables
+  String? rowClassWithReferences(
+      {required DriftTable currentTable,
+      required List<_Relation> relations,
+      required TextEmitter leaf,
+      required String dbClassName}) {
+    return """
+
+        class ${rowClassWithReferencesName(currentTable)} {
+        final ${databaseType(leaf, dbClassName)} _db;
+        final ${rowClassWithPrefix(currentTable, leaf)} ${currentTable.dbGetterName};
+        ${rowClassWithReferencesName(currentTable)}(this._db, this.${currentTable.dbGetterName});
+
+        ${relations.map((relation) {
+      if (relation.isReverse) {
+        // For a reverse relation, we return a filtered table manager
+        return """
+        ${processedTableManagerName(relation.referencedTable)} get ${relation.fieldName} {
+          return ${rootTableManagerWithPrefix(relation.referencedTable, leaf)}(_db,_db.${relation.referencedTable.dbGetterName}).filter((f) => f.${relation.referencedColumn.nameInDart}.${relation.currentColumn.nameInDart}(${currentTable.dbGetterName}.${relation.currentColumn.nameInDart}));
+        }
+        """;
+      } else {
+        return """
+Future<${rowClassWithPrefix(relation.referencedTable, leaf)}?> get ${relation.fieldName} async {
+  if (${currentTable.dbGetterName}.${relation.currentColumn.nameInDart} == null) return null;
+  return await ${rootTableManagerWithPrefix(relation.referencedTable, leaf)}(_db, _db.${relation.referencedTable.dbGetterName}).filter((f) => f.${relation.referencedColumn.nameInDart}(${currentTable.dbGetterName}.${relation.currentColumn.nameInDart}!)).getSingleOrNull();
+}
+
+""";
+      }
+    }).join('\n')}
+
+
+        }""";
   }
 }

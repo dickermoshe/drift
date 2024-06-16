@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/src/utils/single_transformer.dart';
 import 'package:meta/meta.dart';
 
 part 'composer.dart';
 part 'filter.dart';
 part 'composable.dart';
 part 'ordering.dart';
+part 'references.dart';
 
 sealed class _StatementType<T extends Table, DT> {
   const _StatementType();
@@ -40,9 +42,11 @@ class TableManagerState<
     DT,
     FS extends FilterComposer<DB, T>,
     OS extends OrderingComposer<DB, T>,
-    C extends ProcessedTableManager<DB, T, DT, FS, OS, C, CI, CU>,
+    C extends ProcessedTableManager<DB, T, DT, FS, OS, C, CI, CU,
+        DtWithReferences>,
     CI extends Function,
-    CU extends Function> {
+    CU extends Function,
+    DtWithReferences> {
   /// The database used to run the query.
   final DB db;
 
@@ -80,7 +84,8 @@ class TableManagerState<
   final OS orderingComposer;
 
   /// This function is used internaly to return a new instance of the child manager
-  final C Function(TableManagerState<DB, T, DT, FS, OS, C, CI, CU>)
+  final C Function(
+          TableManagerState<DB, T, DT, FS, OS, C, CI, CU, DtWithReferences>)
       _getChildManagerBuilder;
 
   /// This function is passed to the user to create a companion
@@ -90,6 +95,10 @@ class TableManagerState<
   /// This function is passed to the user to create a companion
   /// for updating data in the table
   final CU _getUpdateCompanionBuilder;
+
+  /// This function is used to append references to the data class
+  /// This is used to create a [SelectableWithMapper] instance
+  final ReferenceWrapper<DT, DtWithReferences> _withReferences;
 
   /// Defines a class which holds the state for a table manager
   /// It contains the database instance, the table instance, and any filters/orderings that will be applied to the query
@@ -101,10 +110,12 @@ class TableManagerState<
       required this.table,
       required this.filteringComposer,
       required this.orderingComposer,
-      required C Function(TableManagerState<DB, T, DT, FS, OS, C, CI, CU>)
+      required C Function(
+              TableManagerState<DB, T, DT, FS, OS, C, CI, CU, DtWithReferences>)
           getChildManagerBuilder,
       required CI getInsertCompanionBuilder,
       required CU getUpdateCompanionBuilder,
+      required ReferenceWrapper<DT, DtWithReferences> withReferences,
       this.filter,
       this.distinct,
       this.limit,
@@ -112,11 +123,12 @@ class TableManagerState<
       this.orderingBuilders = const {},
       this.joinBuilders = const {}})
       : _getChildManagerBuilder = getChildManagerBuilder,
+        _withReferences = withReferences,
         _getInsertCompanionBuilder = getInsertCompanionBuilder,
         _getUpdateCompanionBuilder = getUpdateCompanionBuilder;
 
   /// Copy this state with the given values
-  TableManagerState<DB, T, DT, FS, OS, C, CI, CU> copyWith({
+  TableManagerState<DB, T, DT, FS, OS, C, CI, CU, DtWithReferences> copyWith({
     bool? distinct,
     int? limit,
     int? offset,
@@ -132,6 +144,7 @@ class TableManagerState<
       getChildManagerBuilder: _getChildManagerBuilder,
       getInsertCompanionBuilder: _getInsertCompanionBuilder,
       getUpdateCompanionBuilder: _getUpdateCompanionBuilder,
+      withReferences: _withReferences,
       filter: filter ?? this.filter,
       joinBuilders: joinBuilders ?? this.joinBuilders,
       orderingBuilders: orderingBuilders ?? this.orderingBuilders,
@@ -202,12 +215,15 @@ class TableManagerState<
   /// Build a select statement based on the manager state
   Selectable<DT> buildSelectStatement() {
     final result = _buildSelectStatement();
+    final Selectable<DT> selectable;
     switch (result) {
       case _SimpleResult():
-        return result.statement;
+        selectable = result.statement;
       case _JoinedResult():
-        return result.statement.map((p0) => p0.readTable(_tableAsTableInfo));
+        selectable =
+            result.statement.map((p0) => p0.readTable(_tableAsTableInfo));
     }
+    return selectable;
   }
 
   /// Build an update statement based on the manager state
@@ -293,20 +309,19 @@ class TableManagerState<
 /// Most of this classes functionality is kept in a seperate [TableManagerState] class
 /// This is so that the state can be passed down to lower level managers
 abstract class BaseTableManager<
-        DB extends GeneratedDatabase,
-        T extends Table,
-        DT,
-        FS extends FilterComposer<DB, T>,
-        OS extends OrderingComposer<DB, T>,
-        C extends ProcessedTableManager<DB, T, DT, FS, OS, C, CI, CU>,
-        CI extends Function,
-        CU extends Function>
-    implements
-        MultiSelectable<DT>,
-        SingleSelectable<DT>,
-        SingleOrNullSelectable<DT> {
+    DB extends GeneratedDatabase,
+    T extends Table,
+    DT,
+    FS extends FilterComposer<DB, T>,
+    OS extends OrderingComposer<DB, T>,
+    C extends ProcessedTableManager<DB, T, DT, FS, OS, C, CI, CU,
+        DtWithReferences>,
+    CI extends Function,
+    CU extends Function,
+    DtWithReferences> with Selectable<DT> {
   /// The state for this manager
-  final TableManagerState<DB, T, DT, FS, OS, C, CI, CU> $state;
+  final TableManagerState<DB, T, DT, FS, OS, C, CI, CU, DtWithReferences>
+      $state;
 
   /// Create a new [BaseTableManager] instance
   ///
@@ -389,8 +404,8 @@ abstract class BaseTableManager<
   ///
   /// Uses the distinct flag to ensure that only distinct rows are returned
   @override
-  Future<DT> getSingle() =>
-      $state.copyWith(distinct: true).buildSelectStatement().getSingle();
+  Future<DT> getSingle({bool distinct = true}) async =>
+      (await get(distinct: distinct)).single;
 
   /// Creates an auto-updating stream of this statement, similar to
   /// [watch]. However, it is assumed that the query will only emit
@@ -400,8 +415,8 @@ abstract class BaseTableManager<
   ///
   /// Uses the distinct flag to ensure that only distinct rows are returned
   @override
-  Stream<DT> watchSingle() =>
-      $state.copyWith(distinct: true).buildSelectStatement().watchSingle();
+  Stream<DT> watchSingle({bool distinct = true}) =>
+      watch(distinct: distinct).transform(singleElements());
 
   /// Executes the statement and returns all rows as a list.
   ///
@@ -434,11 +449,21 @@ abstract class BaseTableManager<
   ///
   /// See also: [getSingle], which can be used if the query will
   /// always evaluate to exactly one row.
-  ///
-  /// Uses the distinct flag to ensure that only distinct rows are returned
   @override
-  Future<DT?> getSingleOrNull() =>
-      $state.copyWith(distinct: true).buildSelectStatement().getSingleOrNull();
+  Future<DT?> getSingleOrNull({bool distinct = true}) async {
+    final list = await get(distinct: distinct);
+    final iterator = list.iterator;
+
+    if (!iterator.moveNext()) {
+      return null;
+    }
+    final element = iterator.current;
+    if (iterator.moveNext()) {
+      throw StateError('Expected exactly one result, but found more than one!');
+    }
+
+    return element;
+  }
 
   /// Creates an auto-updating stream of this statement, similar to
   /// [watch]. However, it is assumed that the query will only
@@ -448,12 +473,20 @@ abstract class BaseTableManager<
   /// If the query emits zero rows at some point, `null` will be added
   /// to the stream instead.
   ///
-  /// Uses the distinct flag to ensure that only distinct rows are returned
+  /// When querying for a single row,
   @override
-  Stream<DT?> watchSingleOrNull() => $state
-      .copyWith(distinct: true)
-      .buildSelectStatement()
-      .watchSingleOrNull();
+  Stream<DT?> watchSingleOrNull({bool distinct = true}) =>
+      watch(distinct: distinct).transform(singleElementsOrNull());
+
+  SelectableWithMapper<DtWithReferences, DT> withReferences(
+      {bool distinct = false, int? limit, int? offset}) {
+    return SelectableWithMapper(
+      $state
+          .copyWith(distinct: distinct, limit: limit, offset: offset)
+          .buildSelectStatement(),
+      (data) async => $state._withReferences(data),
+    );
+  }
 }
 
 /// A table manager that exposes methods to a table manager that already has filters/orderings/limit applied
@@ -464,29 +497,30 @@ class ProcessedTableManager<
         D,
         FS extends FilterComposer<DB, T>,
         OS extends OrderingComposer<DB, T>,
-        C extends ProcessedTableManager<DB, T, D, FS, OS, C, CI, CU>,
+        C extends ProcessedTableManager<DB, T, D, FS, OS, C, CI, CU,
+            DtWithReferences>,
         CI extends Function,
-        CU extends Function>
-    extends BaseTableManager<DB, T, D, FS, OS, C, CI, CU>
-    implements
-        MultiSelectable<D>,
-        SingleSelectable<D>,
-        SingleOrNullSelectable<D> {
+        CU extends Function,
+        DtWithReferences>
+    extends BaseTableManager<DB, T, D, FS, OS, C, CI, CU, DtWithReferences> {
   /// Create a new [ProcessedTableManager] instance
   @internal
-  const ProcessedTableManager(super.$state);
+  ProcessedTableManager(super.$state);
 }
 
 /// A table manager with top level function for creating, reading, updating, and deleting items
 abstract class RootTableManager<
-    DB extends GeneratedDatabase,
-    T extends Table,
-    D,
-    FS extends FilterComposer<DB, T>,
-    OS extends OrderingComposer<DB, T>,
-    C extends ProcessedTableManager<DB, T, D, FS, OS, C, CI, CU>,
-    CI extends Function,
-    CU extends Function> extends BaseTableManager<DB, T, D, FS, OS, C, CI, CU> {
+        DB extends GeneratedDatabase,
+        T extends Table,
+        D,
+        FS extends FilterComposer<DB, T>,
+        OS extends OrderingComposer<DB, T>,
+        C extends ProcessedTableManager<DB, T, D, FS, OS, C, CI, CU,
+            DtWithReferences>,
+        CI extends Function,
+        CU extends Function,
+        DtWithReferences>
+    extends BaseTableManager<DB, T, D, FS, OS, C, CI, CU, DtWithReferences> {
   /// Create a new [RootTableManager] instance
   ///
   /// {@template manager_internal_use_only}
