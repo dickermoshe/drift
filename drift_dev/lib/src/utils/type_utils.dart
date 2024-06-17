@@ -31,15 +31,15 @@ extension TypeUtils on DartType {
     return $this is InterfaceType ? $this.element.name : null;
   }
 
-  String get userVisibleName => getDisplayString();
+  String get userVisibleName => getDisplayString(withNullability: false);
 
   /// How this type should look like in generated code.
   String codeString() {
     if (nullabilitySuffix == NullabilitySuffix.star) {
       // We can't actually use the legacy star in code, so don't show it.
-      return getDisplayString();
+      return getDisplayString(withNullability: false);
     }
 
-    return getDisplayString();
+    return getDisplayString(withNullability: false);
   }
 }

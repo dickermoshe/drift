@@ -136,7 +136,8 @@ class $UsersTableManager extends i0.RootTableManager<
     i2.$UsersOrderingComposer,
     $UsersProcessedTableManager,
     $UsersInsertCompanionBuilder,
-    $UsersUpdateCompanionBuilder> {
+    $UsersUpdateCompanionBuilder,
+    $UsersWithReferences> {
   $UsersTableManager(i0.GeneratedDatabase db, i2.Users table)
       : super(i0.TableManagerState(
           db: db,
@@ -154,6 +155,8 @@ class $UsersTableManager extends i0.RootTableManager<
             id: id,
             name: name,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $UsersWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String name,
@@ -173,7 +176,8 @@ class $UsersProcessedTableManager extends i0.ProcessedTableManager<
     i2.$UsersOrderingComposer,
     $UsersProcessedTableManager,
     $UsersInsertCompanionBuilder,
-    $UsersUpdateCompanionBuilder> {
+    $UsersUpdateCompanionBuilder,
+    $UsersWithReferences> {
   $UsersProcessedTableManager(super.$state);
 }
 
@@ -203,6 +207,13 @@ class $UsersOrderingComposer
       column: $state.table.name,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $UsersWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.User users;
+  $UsersWithReferences(this._db, this.users);
 }
 
 class Friends extends i0.Table with i0.TableInfo<Friends, i2.Friend> {
@@ -422,7 +433,8 @@ class $FriendsTableManager extends i0.RootTableManager<
     i2.$FriendsOrderingComposer,
     $FriendsProcessedTableManager,
     $FriendsInsertCompanionBuilder,
-    $FriendsUpdateCompanionBuilder> {
+    $FriendsUpdateCompanionBuilder,
+    $FriendsWithReferences> {
   $FriendsTableManager(i0.GeneratedDatabase db, i2.Friends table)
       : super(i0.TableManagerState(
           db: db,
@@ -442,6 +454,8 @@ class $FriendsTableManager extends i0.RootTableManager<
             userB: userB,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $FriendsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int userA,
             required int userB,
@@ -463,7 +477,8 @@ class $FriendsProcessedTableManager extends i0.ProcessedTableManager<
     i2.$FriendsOrderingComposer,
     $FriendsProcessedTableManager,
     $FriendsInsertCompanionBuilder,
-    $FriendsUpdateCompanionBuilder> {
+    $FriendsUpdateCompanionBuilder,
+    $FriendsWithReferences> {
   $FriendsProcessedTableManager(super.$state);
 }
 
@@ -541,6 +556,13 @@ class $FriendsOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $FriendsWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i2.Friend friends;
+  $FriendsWithReferences(this._db, this.friends);
 }
 
 class WithExistingDrift extends i3.ModularAccessor {

@@ -2039,7 +2039,8 @@ class $NoIdsTableManager extends RootTableManager<
     $NoIdsOrderingComposer,
     $NoIdsProcessedTableManager,
     $NoIdsInsertCompanionBuilder,
-    $NoIdsUpdateCompanionBuilder> {
+    $NoIdsUpdateCompanionBuilder,
+    $NoIdsWithReferences> {
   $NoIdsTableManager(_$CustomTablesDb db, NoIds table)
       : super(TableManagerState(
           db: db,
@@ -2053,6 +2054,8 @@ class $NoIdsTableManager extends RootTableManager<
               NoIdsCompanion(
             payload: payload,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $NoIdsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required Uint8List payload,
           }) =>
@@ -2070,7 +2073,8 @@ class $NoIdsProcessedTableManager extends ProcessedTableManager<
     $NoIdsOrderingComposer,
     $NoIdsProcessedTableManager,
     $NoIdsInsertCompanionBuilder,
-    $NoIdsUpdateCompanionBuilder> {
+    $NoIdsUpdateCompanionBuilder,
+    $NoIdsWithReferences> {
   $NoIdsProcessedTableManager(super.$state);
 }
 
@@ -2088,6 +2092,13 @@ class $NoIdsOrderingComposer extends OrderingComposer<_$CustomTablesDb, NoIds> {
       column: $state.table.payload,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $NoIdsWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final NoIdRow noIds;
+  $NoIdsWithReferences(this._db, this.noIds);
 }
 
 typedef $WithDefaultsInsertCompanionBuilder = WithDefaultsCompanion Function({
@@ -2109,7 +2120,8 @@ class $WithDefaultsTableManager extends RootTableManager<
     $WithDefaultsOrderingComposer,
     $WithDefaultsProcessedTableManager,
     $WithDefaultsInsertCompanionBuilder,
-    $WithDefaultsUpdateCompanionBuilder> {
+    $WithDefaultsUpdateCompanionBuilder,
+    $WithDefaultsWithReferences> {
   $WithDefaultsTableManager(_$CustomTablesDb db, WithDefaults table)
       : super(TableManagerState(
           db: db,
@@ -2129,6 +2141,8 @@ class $WithDefaultsTableManager extends RootTableManager<
             b: b,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $WithDefaultsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<String?> a = const Value.absent(),
             Value<int?> b = const Value.absent(),
@@ -2150,7 +2164,8 @@ class $WithDefaultsProcessedTableManager extends ProcessedTableManager<
     $WithDefaultsOrderingComposer,
     $WithDefaultsProcessedTableManager,
     $WithDefaultsInsertCompanionBuilder,
-    $WithDefaultsUpdateCompanionBuilder> {
+    $WithDefaultsUpdateCompanionBuilder,
+    $WithDefaultsWithReferences> {
   $WithDefaultsProcessedTableManager(super.$state);
 }
 
@@ -2182,6 +2197,13 @@ class $WithDefaultsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $WithDefaultsWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final WithDefault withDefaults;
+  $WithDefaultsWithReferences(this._db, this.withDefaults);
+}
+
 typedef $WithConstraintsInsertCompanionBuilder = WithConstraintsCompanion
     Function({
   Value<String?> a,
@@ -2205,7 +2227,8 @@ class $WithConstraintsTableManager extends RootTableManager<
     $WithConstraintsOrderingComposer,
     $WithConstraintsProcessedTableManager,
     $WithConstraintsInsertCompanionBuilder,
-    $WithConstraintsUpdateCompanionBuilder> {
+    $WithConstraintsUpdateCompanionBuilder,
+    $WithConstraintsWithReferences> {
   $WithConstraintsTableManager(_$CustomTablesDb db, WithConstraints table)
       : super(TableManagerState(
           db: db,
@@ -2228,6 +2251,8 @@ class $WithConstraintsTableManager extends RootTableManager<
             c: c,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $WithConstraintsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<String?> a = const Value.absent(),
             required int b,
@@ -2251,7 +2276,8 @@ class $WithConstraintsProcessedTableManager extends ProcessedTableManager<
     $WithConstraintsOrderingComposer,
     $WithConstraintsProcessedTableManager,
     $WithConstraintsInsertCompanionBuilder,
-    $WithConstraintsUpdateCompanionBuilder> {
+    $WithConstraintsUpdateCompanionBuilder,
+    $WithConstraintsWithReferences> {
   $WithConstraintsProcessedTableManager(super.$state);
 }
 
@@ -2293,6 +2319,13 @@ class $WithConstraintsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $WithConstraintsWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final WithConstraint withConstraints;
+  $WithConstraintsWithReferences(this._db, this.withConstraints);
+}
+
 typedef $ConfigTableInsertCompanionBuilder = ConfigCompanion Function({
   required String configKey,
   Value<DriftAny?> configValue,
@@ -2316,7 +2349,8 @@ class $ConfigTableTableManager extends RootTableManager<
     $ConfigTableOrderingComposer,
     $ConfigTableProcessedTableManager,
     $ConfigTableInsertCompanionBuilder,
-    $ConfigTableUpdateCompanionBuilder> {
+    $ConfigTableUpdateCompanionBuilder,
+    $ConfigTableWithReferences> {
   $ConfigTableTableManager(_$CustomTablesDb db, ConfigTable table)
       : super(TableManagerState(
           db: db,
@@ -2340,6 +2374,8 @@ class $ConfigTableTableManager extends RootTableManager<
             syncStateImplicit: syncStateImplicit,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $ConfigTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required String configKey,
             Value<DriftAny?> configValue = const Value.absent(),
@@ -2365,7 +2401,8 @@ class $ConfigTableProcessedTableManager extends ProcessedTableManager<
     $ConfigTableOrderingComposer,
     $ConfigTableProcessedTableManager,
     $ConfigTableInsertCompanionBuilder,
-    $ConfigTableUpdateCompanionBuilder> {
+    $ConfigTableUpdateCompanionBuilder,
+    $ConfigTableWithReferences> {
   $ConfigTableProcessedTableManager(super.$state);
 }
 
@@ -2421,6 +2458,13 @@ class $ConfigTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $ConfigTableWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final Config config;
+  $ConfigTableWithReferences(this._db, this.config);
+}
+
 typedef $MytableInsertCompanionBuilder = MytableCompanion Function({
   Value<int> someid,
   Value<String?> sometext,
@@ -2442,7 +2486,8 @@ class $MytableTableManager extends RootTableManager<
     $MytableOrderingComposer,
     $MytableProcessedTableManager,
     $MytableInsertCompanionBuilder,
-    $MytableUpdateCompanionBuilder> {
+    $MytableUpdateCompanionBuilder,
+    $MytableWithReferences> {
   $MytableTableManager(_$CustomTablesDb db, Mytable table)
       : super(TableManagerState(
           db: db,
@@ -2462,6 +2507,8 @@ class $MytableTableManager extends RootTableManager<
             isInserting: isInserting,
             somedate: somedate,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $MytableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> someid = const Value.absent(),
             Value<String?> sometext = const Value.absent(),
@@ -2485,7 +2532,8 @@ class $MytableProcessedTableManager extends ProcessedTableManager<
     $MytableOrderingComposer,
     $MytableProcessedTableManager,
     $MytableInsertCompanionBuilder,
-    $MytableUpdateCompanionBuilder> {
+    $MytableUpdateCompanionBuilder,
+    $MytableWithReferences> {
   $MytableProcessedTableManager(super.$state);
 }
 
@@ -2536,6 +2584,13 @@ class $MytableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $MytableWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final MytableData mytable;
+  $MytableWithReferences(this._db, this.mytable);
+}
+
 typedef $EmailInsertCompanionBuilder = EmailCompanion Function({
   required String sender,
   required String title,
@@ -2557,7 +2612,8 @@ class $EmailTableManager extends RootTableManager<
     $EmailOrderingComposer,
     $EmailProcessedTableManager,
     $EmailInsertCompanionBuilder,
-    $EmailUpdateCompanionBuilder> {
+    $EmailUpdateCompanionBuilder,
+    $EmailWithReferences> {
   $EmailTableManager(_$CustomTablesDb db, Email table)
       : super(TableManagerState(
           db: db,
@@ -2577,6 +2633,8 @@ class $EmailTableManager extends RootTableManager<
             body: body,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $EmailWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required String sender,
             required String title,
@@ -2600,7 +2658,8 @@ class $EmailProcessedTableManager extends ProcessedTableManager<
     $EmailOrderingComposer,
     $EmailProcessedTableManager,
     $EmailInsertCompanionBuilder,
-    $EmailUpdateCompanionBuilder> {
+    $EmailUpdateCompanionBuilder,
+    $EmailWithReferences> {
   $EmailProcessedTableManager(super.$state);
 }
 
@@ -2640,6 +2699,13 @@ class $EmailOrderingComposer extends OrderingComposer<_$CustomTablesDb, Email> {
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $EmailWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final EMail email;
+  $EmailWithReferences(this._db, this.email);
+}
+
 typedef $WeirdTableInsertCompanionBuilder = WeirdTableCompanion Function({
   required int sqlClass,
   required String textColumn,
@@ -2659,7 +2725,8 @@ class $WeirdTableTableManager extends RootTableManager<
     $WeirdTableOrderingComposer,
     $WeirdTableProcessedTableManager,
     $WeirdTableInsertCompanionBuilder,
-    $WeirdTableUpdateCompanionBuilder> {
+    $WeirdTableUpdateCompanionBuilder,
+    $WeirdTableWithReferences> {
   $WeirdTableTableManager(_$CustomTablesDb db, WeirdTable table)
       : super(TableManagerState(
           db: db,
@@ -2679,6 +2746,8 @@ class $WeirdTableTableManager extends RootTableManager<
             textColumn: textColumn,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $WeirdTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int sqlClass,
             required String textColumn,
@@ -2700,7 +2769,8 @@ class $WeirdTableProcessedTableManager extends ProcessedTableManager<
     $WeirdTableOrderingComposer,
     $WeirdTableProcessedTableManager,
     $WeirdTableInsertCompanionBuilder,
-    $WeirdTableUpdateCompanionBuilder> {
+    $WeirdTableUpdateCompanionBuilder,
+    $WeirdTableWithReferences> {
   $WeirdTableProcessedTableManager(super.$state);
 }
 
@@ -2730,6 +2800,13 @@ class $WeirdTableOrderingComposer
       column: $state.table.textColumn,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $WeirdTableWithReferences {
+  // ignore: unused_field
+  final _$CustomTablesDb _db;
+  final WeirdData weirdTable;
+  $WeirdTableWithReferences(this._db, this.weirdTable);
 }
 
 class $CustomTablesDbManager {

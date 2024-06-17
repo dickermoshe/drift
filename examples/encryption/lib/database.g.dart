@@ -208,7 +208,8 @@ class $$NotesTableTableManager extends RootTableManager<
     $$NotesTableOrderingComposer,
     $$NotesTableProcessedTableManager,
     $$NotesTableInsertCompanionBuilder,
-    $$NotesTableUpdateCompanionBuilder> {
+    $$NotesTableUpdateCompanionBuilder,
+    $$NotesTableWithReferences> {
   $$NotesTableTableManager(_$MyEncryptedDatabase db, $NotesTable table)
       : super(TableManagerState(
           db: db,
@@ -226,6 +227,8 @@ class $$NotesTableTableManager extends RootTableManager<
             id: id,
             content: content,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$NotesTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required String content,
@@ -245,7 +248,8 @@ class $$NotesTableProcessedTableManager extends ProcessedTableManager<
     $$NotesTableOrderingComposer,
     $$NotesTableProcessedTableManager,
     $$NotesTableInsertCompanionBuilder,
-    $$NotesTableUpdateCompanionBuilder> {
+    $$NotesTableUpdateCompanionBuilder,
+    $$NotesTableWithReferences> {
   $$NotesTableProcessedTableManager(super.$state);
 }
 
@@ -275,6 +279,13 @@ class $$NotesTableOrderingComposer
       column: $state.table.content,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$NotesTableWithReferences {
+  // ignore: unused_field
+  final _$MyEncryptedDatabase _db;
+  final Note notes;
+  $$NotesTableWithReferences(this._db, this.notes);
 }
 
 class $MyEncryptedDatabaseManager {

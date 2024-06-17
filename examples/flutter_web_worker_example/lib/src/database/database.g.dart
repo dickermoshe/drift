@@ -231,7 +231,8 @@ class $EntriesTableManager extends RootTableManager<
     $EntriesOrderingComposer,
     $EntriesProcessedTableManager,
     $EntriesInsertCompanionBuilder,
-    $EntriesUpdateCompanionBuilder> {
+    $EntriesUpdateCompanionBuilder,
+    $EntriesWithReferences> {
   $EntriesTableManager(_$MyDatabase db, Entries table)
       : super(TableManagerState(
           db: db,
@@ -247,6 +248,8 @@ class $EntriesTableManager extends RootTableManager<
             id: id,
             value: value,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $EntriesWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required String value,
@@ -266,7 +269,8 @@ class $EntriesProcessedTableManager extends ProcessedTableManager<
     $EntriesOrderingComposer,
     $EntriesProcessedTableManager,
     $EntriesInsertCompanionBuilder,
-    $EntriesUpdateCompanionBuilder> {
+    $EntriesUpdateCompanionBuilder,
+    $EntriesWithReferences> {
   $EntriesProcessedTableManager(super.$state);
 }
 
@@ -294,6 +298,13 @@ class $EntriesOrderingComposer extends OrderingComposer<_$MyDatabase, Entries> {
       column: $state.table.value,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $EntriesWithReferences {
+  // ignore: unused_field
+  final _$MyDatabase _db;
+  final Entry entries;
+  $EntriesWithReferences(this._db, this.entries);
 }
 
 class $MyDatabaseManager {

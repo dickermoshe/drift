@@ -106,6 +106,13 @@ class User extends i0.DataClass implements i0.Insertable<i1.User> {
         id: id ?? this.id,
         name: name ?? this.name,
       );
+  User copyWithCompanion(i1.UsersCompanion data) {
+    return User(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('User(')
@@ -190,7 +197,8 @@ class $$UsersTableTableManager extends i0.RootTableManager<
     i1.$$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableTableManager(i0.GeneratedDatabase db, i1.$UsersTable table)
       : super(i0.TableManagerState(
           db: db,
@@ -208,6 +216,8 @@ class $$UsersTableTableManager extends i0.RootTableManager<
             id: id,
             name: name,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$UsersTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String name,
@@ -227,7 +237,8 @@ class $$UsersTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableProcessedTableManager(super.$state);
 }
 
@@ -257,4 +268,11 @@ class $$UsersTableOrderingComposer
       column: $state.table.name,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$UsersTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.User users;
+  $$UsersTableWithReferences(this._db, this.users);
 }

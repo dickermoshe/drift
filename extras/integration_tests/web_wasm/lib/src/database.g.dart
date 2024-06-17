@@ -107,6 +107,13 @@ class TestTableData extends DataClass implements Insertable<TestTableData> {
         id: id ?? this.id,
         content: content ?? this.content,
       );
+  TestTableData copyWithCompanion(TestTableCompanion data) {
+    return TestTableData(
+      id: data.id.present ? data.id.value : this.id,
+      content: data.content.present ? data.content.value : this.content,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TestTableData(')
@@ -204,7 +211,8 @@ class $$TestTableTableTableManager extends RootTableManager<
     $$TestTableTableOrderingComposer,
     $$TestTableTableProcessedTableManager,
     $$TestTableTableInsertCompanionBuilder,
-    $$TestTableTableUpdateCompanionBuilder> {
+    $$TestTableTableUpdateCompanionBuilder,
+    $$TestTableTableWithReferences> {
   $$TestTableTableTableManager(_$TestDatabase db, $TestTableTable table)
       : super(TableManagerState(
           db: db,
@@ -223,6 +231,8 @@ class $$TestTableTableTableManager extends RootTableManager<
             id: id,
             content: content,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$TestTableTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required String content,
@@ -242,7 +252,8 @@ class $$TestTableTableProcessedTableManager extends ProcessedTableManager<
     $$TestTableTableOrderingComposer,
     $$TestTableTableProcessedTableManager,
     $$TestTableTableInsertCompanionBuilder,
-    $$TestTableTableUpdateCompanionBuilder> {
+    $$TestTableTableUpdateCompanionBuilder,
+    $$TestTableTableWithReferences> {
   $$TestTableTableProcessedTableManager(super.$state);
 }
 
@@ -272,6 +283,13 @@ class $$TestTableTableOrderingComposer
       column: $state.table.content,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$TestTableTableWithReferences {
+  // ignore: unused_field
+  final _$TestDatabase _db;
+  final TestTableData testTable;
+  $$TestTableTableWithReferences(this._db, this.testTable);
 }
 
 class $TestDatabaseManager {

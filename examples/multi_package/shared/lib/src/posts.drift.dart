@@ -116,6 +116,13 @@ class Post extends i0.DataClass implements i0.Insertable<i1.Post> {
         author: author ?? this.author,
         content: content.present ? content.value : this.content,
       );
+  Post copyWithCompanion(i1.PostsCompanion data) {
+    return Post(
+      author: data.author.present ? data.author.value : this.author,
+      content: data.content.present ? data.content.value : this.content,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Post(')
@@ -217,7 +224,8 @@ class $PostsTableManager extends i0.RootTableManager<
     i1.$PostsOrderingComposer,
     $PostsProcessedTableManager,
     $PostsInsertCompanionBuilder,
-    $PostsUpdateCompanionBuilder> {
+    $PostsUpdateCompanionBuilder,
+    $PostsWithReferences> {
   $PostsTableManager(i0.GeneratedDatabase db, i1.Posts table)
       : super(i0.TableManagerState(
           db: db,
@@ -237,6 +245,8 @@ class $PostsTableManager extends i0.RootTableManager<
             content: content,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $PostsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int author,
             i0.Value<String?> content = const i0.Value.absent(),
@@ -258,7 +268,8 @@ class $PostsProcessedTableManager extends i0.ProcessedTableManager<
     i1.$PostsOrderingComposer,
     $PostsProcessedTableManager,
     $PostsInsertCompanionBuilder,
-    $PostsUpdateCompanionBuilder> {
+    $PostsUpdateCompanionBuilder,
+    $PostsWithReferences> {
   $PostsProcessedTableManager(super.$state);
 }
 
@@ -312,4 +323,11 @@ class $PostsOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $PostsWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Post posts;
+  $PostsWithReferences(this._db, this.posts);
 }

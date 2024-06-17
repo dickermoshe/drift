@@ -350,7 +350,8 @@ class $UsersTableManager extends i0.RootTableManager<
     i1.$UsersOrderingComposer,
     $UsersProcessedTableManager,
     $UsersInsertCompanionBuilder,
-    $UsersUpdateCompanionBuilder> {
+    $UsersUpdateCompanionBuilder,
+    $UsersWithReferences> {
   $UsersTableManager(i0.GeneratedDatabase db, i1.Users table)
       : super(i0.TableManagerState(
           db: db,
@@ -374,6 +375,8 @@ class $UsersTableManager extends i0.RootTableManager<
             preferences: preferences,
             profilePicture: profilePicture,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $UsersWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String name,
@@ -399,7 +402,8 @@ class $UsersProcessedTableManager extends i0.ProcessedTableManager<
     i1.$UsersOrderingComposer,
     $UsersProcessedTableManager,
     $UsersInsertCompanionBuilder,
-    $UsersUpdateCompanionBuilder> {
+    $UsersUpdateCompanionBuilder,
+    $UsersWithReferences> {
   $UsersProcessedTableManager(super.$state);
 }
 
@@ -462,6 +466,13 @@ class $UsersOrderingComposer
           column: $state.table.profilePicture,
           builder: (column, joinBuilders) =>
               i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $UsersWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.User users;
+  $UsersWithReferences(this._db, this.users);
 }
 
 i0.Index get usersName =>
@@ -687,7 +698,8 @@ class $FollowsTableManager extends i0.RootTableManager<
     i1.$FollowsOrderingComposer,
     $FollowsProcessedTableManager,
     $FollowsInsertCompanionBuilder,
-    $FollowsUpdateCompanionBuilder> {
+    $FollowsUpdateCompanionBuilder,
+    $FollowsWithReferences> {
   $FollowsTableManager(i0.GeneratedDatabase db, i1.Follows table)
       : super(i0.TableManagerState(
           db: db,
@@ -707,6 +719,8 @@ class $FollowsTableManager extends i0.RootTableManager<
             follower: follower,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $FollowsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int followed,
             required int follower,
@@ -728,7 +742,8 @@ class $FollowsProcessedTableManager extends i0.ProcessedTableManager<
     i1.$FollowsOrderingComposer,
     $FollowsProcessedTableManager,
     $FollowsInsertCompanionBuilder,
-    $FollowsUpdateCompanionBuilder> {
+    $FollowsUpdateCompanionBuilder,
+    $FollowsWithReferences> {
   $FollowsProcessedTableManager(super.$state);
 }
 
@@ -806,6 +821,13 @@ class $FollowsOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $FollowsWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Follow follows;
+  $FollowsWithReferences(this._db, this.follows);
 }
 
 class PopularUser extends i0.DataClass {

@@ -336,7 +336,8 @@ class $$TodoItemsTableTableManager extends i0.RootTableManager<
     i1.$$TodoItemsTableOrderingComposer,
     $$TodoItemsTableProcessedTableManager,
     $$TodoItemsTableInsertCompanionBuilder,
-    $$TodoItemsTableUpdateCompanionBuilder> {
+    $$TodoItemsTableUpdateCompanionBuilder,
+    $$TodoItemsTableWithReferences> {
   $$TodoItemsTableTableManager(
       i0.GeneratedDatabase db, i1.$TodoItemsTable table)
       : super(i0.TableManagerState(
@@ -362,6 +363,8 @@ class $$TodoItemsTableTableManager extends i0.RootTableManager<
             category: category,
             dueDate: dueDate,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$TodoItemsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String title,
@@ -387,7 +390,8 @@ class $$TodoItemsTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$TodoItemsTableOrderingComposer,
     $$TodoItemsTableProcessedTableManager,
     $$TodoItemsTableInsertCompanionBuilder,
-    $$TodoItemsTableUpdateCompanionBuilder> {
+    $$TodoItemsTableUpdateCompanionBuilder,
+    $$TodoItemsTableWithReferences> {
   $$TodoItemsTableProcessedTableManager(super.$state);
 }
 
@@ -472,6 +476,13 @@ class $$TodoItemsTableOrderingComposer
                     parentComposers)));
     return composer;
   }
+}
+
+class $$TodoItemsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.TodoItem todoItems;
+  $$TodoItemsTableWithReferences(this._db, this.todoItems);
 }
 
 class $CategoriesTable extends i2.Categories
@@ -671,7 +682,8 @@ class $$CategoriesTableTableManager extends i0.RootTableManager<
     i1.$$CategoriesTableOrderingComposer,
     $$CategoriesTableProcessedTableManager,
     $$CategoriesTableInsertCompanionBuilder,
-    $$CategoriesTableUpdateCompanionBuilder> {
+    $$CategoriesTableUpdateCompanionBuilder,
+    $$CategoriesTableWithReferences> {
   $$CategoriesTableTableManager(
       i0.GeneratedDatabase db, i1.$CategoriesTable table)
       : super(i0.TableManagerState(
@@ -691,6 +703,8 @@ class $$CategoriesTableTableManager extends i0.RootTableManager<
             id: id,
             name: name,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$CategoriesTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String name,
@@ -710,7 +724,8 @@ class $$CategoriesTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$CategoriesTableOrderingComposer,
     $$CategoriesTableProcessedTableManager,
     $$CategoriesTableInsertCompanionBuilder,
-    $$CategoriesTableUpdateCompanionBuilder> {
+    $$CategoriesTableUpdateCompanionBuilder,
+    $$CategoriesTableWithReferences> {
   $$CategoriesTableProcessedTableManager(super.$state);
 }
 
@@ -740,6 +755,13 @@ class $$CategoriesTableOrderingComposer
       column: $state.table.name,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$CategoriesTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Category categories;
+  $$CategoriesTableWithReferences(this._db, this.categories);
 }
 
 class $UsersTable extends i2.Users with i0.TableInfo<$UsersTable, i1.User> {
@@ -939,7 +961,8 @@ class $$UsersTableTableManager extends i0.RootTableManager<
     i1.$$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableTableManager(i0.GeneratedDatabase db, i1.$UsersTable table)
       : super(i0.TableManagerState(
           db: db,
@@ -957,6 +980,8 @@ class $$UsersTableTableManager extends i0.RootTableManager<
             id: id,
             birthDate: birthDate,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$UsersTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required DateTime birthDate,
@@ -976,7 +1001,8 @@ class $$UsersTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableProcessedTableManager(super.$state);
 }
 
@@ -1006,4 +1032,11 @@ class $$UsersTableOrderingComposer
       column: $state.table.birthDate,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$UsersTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.User users;
+  $$UsersTableWithReferences(this._db, this.users);
 }

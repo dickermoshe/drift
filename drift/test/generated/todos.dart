@@ -31,7 +31,8 @@ class TodosTable extends Table with AutoIncrement {
   @ReferenceName("todos")
   IntColumn get category => integer()
       .references(Categories, #id, initiallyDeferred: true)
-      .nullable()();
+      .nullable()
+      .map(TypeConverter.extensionType<RowId, int>())();
 
   TextColumn get status => textEnum<TodoStatus>().nullable()();
 

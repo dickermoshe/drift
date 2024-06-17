@@ -244,7 +244,8 @@ class $PostsTableManager extends i0.RootTableManager<
     i1.$PostsOrderingComposer,
     $PostsProcessedTableManager,
     $PostsInsertCompanionBuilder,
-    $PostsUpdateCompanionBuilder> {
+    $PostsUpdateCompanionBuilder,
+    $PostsWithReferences> {
   $PostsTableManager(i0.GeneratedDatabase db, i1.Posts table)
       : super(i0.TableManagerState(
           db: db,
@@ -264,6 +265,8 @@ class $PostsTableManager extends i0.RootTableManager<
             author: author,
             content: content,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $PostsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required int author,
@@ -285,7 +288,8 @@ class $PostsProcessedTableManager extends i0.ProcessedTableManager<
     i1.$PostsOrderingComposer,
     $PostsProcessedTableManager,
     $PostsInsertCompanionBuilder,
-    $PostsUpdateCompanionBuilder> {
+    $PostsUpdateCompanionBuilder,
+    $PostsWithReferences> {
   $PostsProcessedTableManager(super.$state);
 }
 
@@ -349,6 +353,13 @@ class $PostsOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $PostsWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Post posts;
+  $PostsWithReferences(this._db, this.posts);
 }
 
 class Likes extends i0.Table with i0.TableInfo<Likes, i1.Like> {
@@ -566,7 +577,8 @@ class $LikesTableManager extends i0.RootTableManager<
     i1.$LikesOrderingComposer,
     $LikesProcessedTableManager,
     $LikesInsertCompanionBuilder,
-    $LikesUpdateCompanionBuilder> {
+    $LikesUpdateCompanionBuilder,
+    $LikesWithReferences> {
   $LikesTableManager(i0.GeneratedDatabase db, i1.Likes table)
       : super(i0.TableManagerState(
           db: db,
@@ -586,6 +598,8 @@ class $LikesTableManager extends i0.RootTableManager<
             likedBy: likedBy,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $LikesWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int post,
             required int likedBy,
@@ -607,7 +621,8 @@ class $LikesProcessedTableManager extends i0.ProcessedTableManager<
     i1.$LikesOrderingComposer,
     $LikesProcessedTableManager,
     $LikesInsertCompanionBuilder,
-    $LikesUpdateCompanionBuilder> {
+    $LikesUpdateCompanionBuilder,
+    $LikesWithReferences> {
   $LikesProcessedTableManager(super.$state);
 }
 
@@ -685,4 +700,11 @@ class $LikesOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $LikesWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Like likes;
+  $LikesWithReferences(this._db, this.likes);
 }

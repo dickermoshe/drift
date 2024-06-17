@@ -308,12 +308,13 @@ class $TodosTableTable extends TodosTable
   static const VerificationMeta _categoryMeta =
       const VerificationMeta('category');
   @override
-  late final GeneratedColumn<int> category = GeneratedColumn<int>(
-      'category', aliasedName, true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES categories (id) DEFERRABLE INITIALLY DEFERRED'));
+  late final GeneratedColumnWithTypeConverter<RowId?, int> category =
+      GeneratedColumn<int>('category', aliasedName, true,
+              type: DriftSqlType.int,
+              requiredDuringInsert: false,
+              defaultConstraints: GeneratedColumn.constraintIsAlways(
+                  'REFERENCES categories (id) DEFERRABLE INITIALLY DEFERRED'))
+          .withConverter<RowId?>($TodosTableTable.$convertercategoryn);
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
   late final GeneratedColumnWithTypeConverter<TodoStatus?, String> status =
@@ -350,10 +351,7 @@ class $TodosTableTable extends TodosTable
           targetDate.isAcceptableOrUnknown(
               data['target_date']!, _targetDateMeta));
     }
-    if (data.containsKey('category')) {
-      context.handle(_categoryMeta,
-          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
-    }
+    context.handle(_categoryMeta, const VerificationResult.success());
     context.handle(_statusMeta, const VerificationResult.success());
     return context;
   }
@@ -377,8 +375,9 @@ class $TodosTableTable extends TodosTable
           .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
       targetDate: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}target_date']),
-      category: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}category']),
+      category: $TodosTableTable.$convertercategoryn.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}category'])),
       status: $TodosTableTable.$converterstatusn.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}status'])),
@@ -392,6 +391,10 @@ class $TodosTableTable extends TodosTable
 
   static JsonTypeConverter2<RowId, int, int> $converterid =
       TypeConverter.extensionType<RowId, int>();
+  static JsonTypeConverter2<RowId, int, int> $convertercategory =
+      TypeConverter.extensionType<RowId, int>();
+  static JsonTypeConverter2<RowId?, int?, int?> $convertercategoryn =
+      JsonTypeConverter2.asNullable($convertercategory);
   static JsonTypeConverter2<TodoStatus, String, String> $converterstatus =
       const EnumNameConverter<TodoStatus>(TodoStatus.values);
   static JsonTypeConverter2<TodoStatus?, String?, String?> $converterstatusn =
@@ -403,7 +406,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
   final String? title;
   final String content;
   final DateTime? targetDate;
-  final int? category;
+  final RowId? category;
   final TodoStatus? status;
   const TodoEntry(
       {required this.id,
@@ -426,7 +429,8 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       map['target_date'] = Variable<DateTime>(targetDate);
     }
     if (!nullToAbsent || category != null) {
-      map['category'] = Variable<int>(category);
+      map['category'] =
+          Variable<int>($TodosTableTable.$convertercategoryn.toSql(category));
     }
     if (!nullToAbsent || status != null) {
       map['status'] =
@@ -461,7 +465,8 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       title: serializer.fromJson<String?>(json['title']),
       content: serializer.fromJson<String>(json['content']),
       targetDate: serializer.fromJson<DateTime?>(json['target_date']),
-      category: serializer.fromJson<int?>(json['category']),
+      category: $TodosTableTable.$convertercategoryn
+          .fromJson(serializer.fromJson<int?>(json['category'])),
       status: $TodosTableTable.$converterstatusn
           .fromJson(serializer.fromJson<String?>(json['status'])),
     );
@@ -479,7 +484,8 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       'title': serializer.toJson<String?>(title),
       'content': serializer.toJson<String>(content),
       'target_date': serializer.toJson<DateTime?>(targetDate),
-      'category': serializer.toJson<int?>(category),
+      'category': serializer
+          .toJson<int?>($TodosTableTable.$convertercategoryn.toJson(category)),
       'status': serializer
           .toJson<String?>($TodosTableTable.$converterstatusn.toJson(status)),
     };
@@ -490,7 +496,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
           Value<String?> title = const Value.absent(),
           String? content,
           Value<DateTime?> targetDate = const Value.absent(),
-          Value<int?> category = const Value.absent(),
+          Value<RowId?> category = const Value.absent(),
           Value<TodoStatus?> status = const Value.absent()}) =>
       TodoEntry(
         id: id ?? this.id,
@@ -545,7 +551,7 @@ class TodosTableCompanion extends UpdateCompanion<TodoEntry> {
   final Value<String?> title;
   final Value<String> content;
   final Value<DateTime?> targetDate;
-  final Value<int?> category;
+  final Value<RowId?> category;
   final Value<TodoStatus?> status;
   const TodosTableCompanion({
     this.id = const Value.absent(),
@@ -586,7 +592,7 @@ class TodosTableCompanion extends UpdateCompanion<TodoEntry> {
       Value<String?>? title,
       Value<String>? content,
       Value<DateTime?>? targetDate,
-      Value<int?>? category,
+      Value<RowId?>? category,
       Value<TodoStatus?>? status}) {
     return TodosTableCompanion(
       id: id ?? this.id,
@@ -614,7 +620,8 @@ class TodosTableCompanion extends UpdateCompanion<TodoEntry> {
       map['target_date'] = Variable<DateTime>(targetDate.value);
     }
     if (category.present) {
-      map['category'] = Variable<int>(category.value);
+      map['category'] = Variable<int>(
+          $TodosTableTable.$convertercategoryn.toSql(category.value));
     }
     if (status.present) {
       map['status'] = Variable<String>(
@@ -3355,7 +3362,9 @@ abstract class _$TodoDb extends GeneratedDatabase {
           title: row.readNullable<String>('title'),
           content: row.read<String>('content'),
           targetDate: row.readNullable<DateTime>('target_date'),
-          category: row.readNullable<int>('category'),
+          category: NullAwareTypeConverter.wrapFromSql(
+              $TodosTableTable.$convertercategory,
+              row.readNullable<int>('category')),
           status: NullAwareTypeConverter.wrapFromSql(
               $TodosTableTable.$converterstatus,
               row.readNullable<String>('status')),
@@ -3452,7 +3461,8 @@ class $$CategoriesTableTableManager extends RootTableManager<
     $$CategoriesTableOrderingComposer,
     $$CategoriesTableProcessedTableManager,
     $$CategoriesTableInsertCompanionBuilder,
-    $$CategoriesTableUpdateCompanionBuilder> {
+    $$CategoriesTableUpdateCompanionBuilder,
+    $$CategoriesTableWithReferences> {
   $$CategoriesTableTableManager(_$TodoDb db, $CategoriesTable table)
       : super(TableManagerState(
           db: db,
@@ -3473,6 +3483,8 @@ class $$CategoriesTableTableManager extends RootTableManager<
             description: description,
             priority: priority,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$CategoriesTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<RowId> id = const Value.absent(),
             required String description,
@@ -3494,7 +3506,8 @@ class $$CategoriesTableProcessedTableManager extends ProcessedTableManager<
     $$CategoriesTableOrderingComposer,
     $$CategoriesTableProcessedTableManager,
     $$CategoriesTableInsertCompanionBuilder,
-    $$CategoriesTableUpdateCompanionBuilder> {
+    $$CategoriesTableUpdateCompanionBuilder,
+    $$CategoriesTableWithReferences> {
   $$CategoriesTableProcessedTableManager(super.$state);
 }
 
@@ -3564,12 +3577,24 @@ class $$CategoriesTableOrderingComposer
               ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$CategoriesTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final Category categories;
+  $$CategoriesTableWithReferences(this._db, this.categories);
+
+  $$TodosTableTableProcessedTableManager get todos {
+    return $$TodosTableTableTableManager(_db, _db.todosTable)
+        .filter((f) => f.category.id(categories.id));
+  }
+}
+
 typedef $$TodosTableTableInsertCompanionBuilder = TodosTableCompanion Function({
   Value<RowId> id,
   Value<String?> title,
   required String content,
   Value<DateTime?> targetDate,
-  Value<int?> category,
+  Value<RowId?> category,
   Value<TodoStatus?> status,
 });
 typedef $$TodosTableTableUpdateCompanionBuilder = TodosTableCompanion Function({
@@ -3577,7 +3602,7 @@ typedef $$TodosTableTableUpdateCompanionBuilder = TodosTableCompanion Function({
   Value<String?> title,
   Value<String> content,
   Value<DateTime?> targetDate,
-  Value<int?> category,
+  Value<RowId?> category,
   Value<TodoStatus?> status,
 });
 
@@ -3589,7 +3614,8 @@ class $$TodosTableTableTableManager extends RootTableManager<
     $$TodosTableTableOrderingComposer,
     $$TodosTableTableProcessedTableManager,
     $$TodosTableTableInsertCompanionBuilder,
-    $$TodosTableTableUpdateCompanionBuilder> {
+    $$TodosTableTableUpdateCompanionBuilder,
+    $$TodosTableTableWithReferences> {
   $$TodosTableTableTableManager(_$TodoDb db, $TodosTableTable table)
       : super(TableManagerState(
           db: db,
@@ -3605,7 +3631,7 @@ class $$TodosTableTableTableManager extends RootTableManager<
             Value<String?> title = const Value.absent(),
             Value<String> content = const Value.absent(),
             Value<DateTime?> targetDate = const Value.absent(),
-            Value<int?> category = const Value.absent(),
+            Value<RowId?> category = const Value.absent(),
             Value<TodoStatus?> status = const Value.absent(),
           }) =>
               TodosTableCompanion(
@@ -3616,12 +3642,14 @@ class $$TodosTableTableTableManager extends RootTableManager<
             category: category,
             status: status,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$TodosTableTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<RowId> id = const Value.absent(),
             Value<String?> title = const Value.absent(),
             required String content,
             Value<DateTime?> targetDate = const Value.absent(),
-            Value<int?> category = const Value.absent(),
+            Value<RowId?> category = const Value.absent(),
             Value<TodoStatus?> status = const Value.absent(),
           }) =>
               TodosTableCompanion.insert(
@@ -3643,7 +3671,8 @@ class $$TodosTableTableProcessedTableManager extends ProcessedTableManager<
     $$TodosTableTableOrderingComposer,
     $$TodosTableTableProcessedTableManager,
     $$TodosTableTableInsertCompanionBuilder,
-    $$TodosTableTableUpdateCompanionBuilder> {
+    $$TodosTableTableUpdateCompanionBuilder,
+    $$TodosTableTableWithReferences> {
   $$TodosTableTableProcessedTableManager(super.$state);
 }
 
@@ -3733,6 +3762,19 @@ class $$TodosTableTableOrderingComposer
   }
 }
 
+class $$TodosTableTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final TodoEntry todosTable;
+  $$TodosTableTableWithReferences(this._db, this.todosTable);
+
+  $$CategoriesTableProcessedTableManager? get category {
+    if (todosTable.category == null) return null;
+    return $$CategoriesTableTableManager(_db, _db.categories)
+        .filter((f) => f.id(todosTable.category!));
+  }
+}
+
 typedef $$UsersTableInsertCompanionBuilder = UsersCompanion Function({
   Value<RowId> id,
   required String name,
@@ -3756,7 +3798,8 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableTableManager(_$TodoDb db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -3780,6 +3823,8 @@ class $$UsersTableTableManager extends RootTableManager<
             profilePicture: profilePicture,
             creationTime: creationTime,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$UsersTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<RowId> id = const Value.absent(),
             required String name,
@@ -3805,7 +3850,8 @@ class $$UsersTableProcessedTableManager extends ProcessedTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableProcessedTableManager(super.$state);
 }
 
@@ -3868,6 +3914,13 @@ class $$UsersTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$UsersTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final User users;
+  $$UsersTableWithReferences(this._db, this.users);
+}
+
 typedef $$SharedTodosTableInsertCompanionBuilder = SharedTodosCompanion
     Function({
   required int todo,
@@ -3889,7 +3942,8 @@ class $$SharedTodosTableTableManager extends RootTableManager<
     $$SharedTodosTableOrderingComposer,
     $$SharedTodosTableProcessedTableManager,
     $$SharedTodosTableInsertCompanionBuilder,
-    $$SharedTodosTableUpdateCompanionBuilder> {
+    $$SharedTodosTableUpdateCompanionBuilder,
+    $$SharedTodosTableWithReferences> {
   $$SharedTodosTableTableManager(_$TodoDb db, $SharedTodosTable table)
       : super(TableManagerState(
           db: db,
@@ -3910,6 +3964,8 @@ class $$SharedTodosTableTableManager extends RootTableManager<
             user: user,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$SharedTodosTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int todo,
             required int user,
@@ -3931,7 +3987,8 @@ class $$SharedTodosTableProcessedTableManager extends ProcessedTableManager<
     $$SharedTodosTableOrderingComposer,
     $$SharedTodosTableProcessedTableManager,
     $$SharedTodosTableInsertCompanionBuilder,
-    $$SharedTodosTableUpdateCompanionBuilder> {
+    $$SharedTodosTableUpdateCompanionBuilder,
+    $$SharedTodosTableWithReferences> {
   $$SharedTodosTableProcessedTableManager(super.$state);
 }
 
@@ -3963,6 +4020,13 @@ class $$SharedTodosTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$SharedTodosTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final SharedTodo sharedTodos;
+  $$SharedTodosTableWithReferences(this._db, this.sharedTodos);
+}
+
 typedef $$TableWithoutPKTableInsertCompanionBuilder = TableWithoutPKCompanion
     Function({
   required int notReallyAnId,
@@ -3988,7 +4052,8 @@ class $$TableWithoutPKTableTableManager extends RootTableManager<
     $$TableWithoutPKTableOrderingComposer,
     $$TableWithoutPKTableProcessedTableManager,
     $$TableWithoutPKTableInsertCompanionBuilder,
-    $$TableWithoutPKTableUpdateCompanionBuilder> {
+    $$TableWithoutPKTableUpdateCompanionBuilder,
+    $$TableWithoutPKTableWithReferences> {
   $$TableWithoutPKTableTableManager(_$TodoDb db, $TableWithoutPKTable table)
       : super(TableManagerState(
           db: db,
@@ -4013,6 +4078,9 @@ class $$TableWithoutPKTableTableManager extends RootTableManager<
             custom: custom,
             rowid: rowid,
           ),
+          withReferences: (p0) async => p0
+              .map((e) => $$TableWithoutPKTableWithReferences(db, e))
+              .toList(),
           getInsertCompanionBuilder: ({
             required int notReallyAnId,
             required double someFloat,
@@ -4038,7 +4106,8 @@ class $$TableWithoutPKTableProcessedTableManager extends ProcessedTableManager<
     $$TableWithoutPKTableOrderingComposer,
     $$TableWithoutPKTableProcessedTableManager,
     $$TableWithoutPKTableInsertCompanionBuilder,
-    $$TableWithoutPKTableUpdateCompanionBuilder> {
+    $$TableWithoutPKTableUpdateCompanionBuilder,
+    $$TableWithoutPKTableWithReferences> {
   $$TableWithoutPKTableProcessedTableManager(super.$state);
 }
 
@@ -4092,6 +4161,13 @@ class $$TableWithoutPKTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$TableWithoutPKTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final CustomRowClass tableWithoutPK;
+  $$TableWithoutPKTableWithReferences(this._db, this.tableWithoutPK);
+}
+
 typedef $$PureDefaultsTableInsertCompanionBuilder = PureDefaultsCompanion
     Function({
   Value<MyCustomObject?> txt,
@@ -4111,7 +4187,8 @@ class $$PureDefaultsTableTableManager extends RootTableManager<
     $$PureDefaultsTableOrderingComposer,
     $$PureDefaultsTableProcessedTableManager,
     $$PureDefaultsTableInsertCompanionBuilder,
-    $$PureDefaultsTableUpdateCompanionBuilder> {
+    $$PureDefaultsTableUpdateCompanionBuilder,
+    $$PureDefaultsTableWithReferences> {
   $$PureDefaultsTableTableManager(_$TodoDb db, $PureDefaultsTable table)
       : super(TableManagerState(
           db: db,
@@ -4130,6 +4207,8 @@ class $$PureDefaultsTableTableManager extends RootTableManager<
             txt: txt,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$PureDefaultsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<MyCustomObject?> txt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -4149,7 +4228,8 @@ class $$PureDefaultsTableProcessedTableManager extends ProcessedTableManager<
     $$PureDefaultsTableOrderingComposer,
     $$PureDefaultsTableProcessedTableManager,
     $$PureDefaultsTableInsertCompanionBuilder,
-    $$PureDefaultsTableUpdateCompanionBuilder> {
+    $$PureDefaultsTableUpdateCompanionBuilder,
+    $$PureDefaultsTableWithReferences> {
   $$PureDefaultsTableProcessedTableManager(super.$state);
 }
 
@@ -4173,6 +4253,13 @@ class $$PureDefaultsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$PureDefaultsTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final PureDefault pureDefaults;
+  $$PureDefaultsTableWithReferences(this._db, this.pureDefaults);
+}
+
 typedef $$WithCustomTypeTableInsertCompanionBuilder = WithCustomTypeCompanion
     Function({
   required UuidValue id,
@@ -4192,7 +4279,8 @@ class $$WithCustomTypeTableTableManager extends RootTableManager<
     $$WithCustomTypeTableOrderingComposer,
     $$WithCustomTypeTableProcessedTableManager,
     $$WithCustomTypeTableInsertCompanionBuilder,
-    $$WithCustomTypeTableUpdateCompanionBuilder> {
+    $$WithCustomTypeTableUpdateCompanionBuilder,
+    $$WithCustomTypeTableWithReferences> {
   $$WithCustomTypeTableTableManager(_$TodoDb db, $WithCustomTypeTable table)
       : super(TableManagerState(
           db: db,
@@ -4211,6 +4299,9 @@ class $$WithCustomTypeTableTableManager extends RootTableManager<
             id: id,
             rowid: rowid,
           ),
+          withReferences: (p0) async => p0
+              .map((e) => $$WithCustomTypeTableWithReferences(db, e))
+              .toList(),
           getInsertCompanionBuilder: ({
             required UuidValue id,
             Value<int> rowid = const Value.absent(),
@@ -4230,7 +4321,8 @@ class $$WithCustomTypeTableProcessedTableManager extends ProcessedTableManager<
     $$WithCustomTypeTableOrderingComposer,
     $$WithCustomTypeTableProcessedTableManager,
     $$WithCustomTypeTableInsertCompanionBuilder,
-    $$WithCustomTypeTableUpdateCompanionBuilder> {
+    $$WithCustomTypeTableUpdateCompanionBuilder,
+    $$WithCustomTypeTableWithReferences> {
   $$WithCustomTypeTableProcessedTableManager(super.$state);
 }
 
@@ -4250,6 +4342,13 @@ class $$WithCustomTypeTableOrderingComposer
       column: $state.table.id,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$WithCustomTypeTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final WithCustomTypeData withCustomType;
+  $$WithCustomTypeTableWithReferences(this._db, this.withCustomType);
 }
 
 typedef $$TableWithEveryColumnTypeTableInsertCompanionBuilder
@@ -4287,7 +4386,8 @@ class $$TableWithEveryColumnTypeTableTableManager extends RootTableManager<
     $$TableWithEveryColumnTypeTableOrderingComposer,
     $$TableWithEveryColumnTypeTableProcessedTableManager,
     $$TableWithEveryColumnTypeTableInsertCompanionBuilder,
-    $$TableWithEveryColumnTypeTableUpdateCompanionBuilder> {
+    $$TableWithEveryColumnTypeTableUpdateCompanionBuilder,
+    $$TableWithEveryColumnTypeTableWithReferences> {
   $$TableWithEveryColumnTypeTableTableManager(
       _$TodoDb db, $TableWithEveryColumnTypeTable table)
       : super(TableManagerState(
@@ -4323,6 +4423,9 @@ class $$TableWithEveryColumnTypeTableTableManager extends RootTableManager<
             anIntEnum: anIntEnum,
             aTextWithConverter: aTextWithConverter,
           ),
+          withReferences: (p0) async => p0
+              .map((e) => $$TableWithEveryColumnTypeTableWithReferences(db, e))
+              .toList(),
           getInsertCompanionBuilder: ({
             Value<RowId> id = const Value.absent(),
             Value<bool?> aBool = const Value.absent(),
@@ -4359,7 +4462,8 @@ class $$TableWithEveryColumnTypeTableProcessedTableManager
         $$TableWithEveryColumnTypeTableOrderingComposer,
         $$TableWithEveryColumnTypeTableProcessedTableManager,
         $$TableWithEveryColumnTypeTableInsertCompanionBuilder,
-        $$TableWithEveryColumnTypeTableUpdateCompanionBuilder> {
+        $$TableWithEveryColumnTypeTableUpdateCompanionBuilder,
+        $$TableWithEveryColumnTypeTableWithReferences> {
   $$TableWithEveryColumnTypeTableProcessedTableManager(super.$state);
 }
 
@@ -4477,6 +4581,14 @@ class $$TableWithEveryColumnTypeTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$TableWithEveryColumnTypeTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final TableWithEveryColumnTypeData tableWithEveryColumnType;
+  $$TableWithEveryColumnTypeTableWithReferences(
+      this._db, this.tableWithEveryColumnType);
+}
+
 typedef $$DepartmentTableInsertCompanionBuilder = DepartmentCompanion Function({
   Value<int> id,
   Value<String?> name,
@@ -4494,7 +4606,8 @@ class $$DepartmentTableTableManager extends RootTableManager<
     $$DepartmentTableOrderingComposer,
     $$DepartmentTableProcessedTableManager,
     $$DepartmentTableInsertCompanionBuilder,
-    $$DepartmentTableUpdateCompanionBuilder> {
+    $$DepartmentTableUpdateCompanionBuilder,
+    $$DepartmentTableWithReferences> {
   $$DepartmentTableTableManager(_$TodoDb db, $DepartmentTable table)
       : super(TableManagerState(
           db: db,
@@ -4513,6 +4626,8 @@ class $$DepartmentTableTableManager extends RootTableManager<
             id: id,
             name: name,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$DepartmentTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -4532,7 +4647,8 @@ class $$DepartmentTableProcessedTableManager extends ProcessedTableManager<
     $$DepartmentTableOrderingComposer,
     $$DepartmentTableProcessedTableManager,
     $$DepartmentTableInsertCompanionBuilder,
-    $$DepartmentTableUpdateCompanionBuilder> {
+    $$DepartmentTableUpdateCompanionBuilder,
+    $$DepartmentTableWithReferences> {
   $$DepartmentTableProcessedTableManager(super.$state);
 }
 
@@ -4577,6 +4693,18 @@ class $$DepartmentTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$DepartmentTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final DepartmentData department;
+  $$DepartmentTableWithReferences(this._db, this.department);
+
+  $$ProductTableProcessedTableManager get productRefs {
+    return $$ProductTableTableManager(_db, _db.product)
+        .filter((f) => f.department.id(department.id));
+  }
+}
+
 typedef $$ProductTableInsertCompanionBuilder = ProductCompanion Function({
   Value<int> id,
   Value<String?> name,
@@ -4596,7 +4724,8 @@ class $$ProductTableTableManager extends RootTableManager<
     $$ProductTableOrderingComposer,
     $$ProductTableProcessedTableManager,
     $$ProductTableInsertCompanionBuilder,
-    $$ProductTableUpdateCompanionBuilder> {
+    $$ProductTableUpdateCompanionBuilder,
+    $$ProductTableWithReferences> {
   $$ProductTableTableManager(_$TodoDb db, $ProductTable table)
       : super(TableManagerState(
           db: db,
@@ -4616,6 +4745,8 @@ class $$ProductTableTableManager extends RootTableManager<
             name: name,
             department: department,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$ProductTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -4637,7 +4768,8 @@ class $$ProductTableProcessedTableManager extends ProcessedTableManager<
     $$ProductTableOrderingComposer,
     $$ProductTableProcessedTableManager,
     $$ProductTableInsertCompanionBuilder,
-    $$ProductTableUpdateCompanionBuilder> {
+    $$ProductTableUpdateCompanionBuilder,
+    $$ProductTableWithReferences> {
   $$ProductTableProcessedTableManager(super.$state);
 }
 
@@ -4706,6 +4838,24 @@ class $$ProductTableOrderingComposer
   }
 }
 
+class $$ProductTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final ProductData product;
+  $$ProductTableWithReferences(this._db, this.product);
+
+  $$DepartmentTableProcessedTableManager? get department {
+    if (product.department == null) return null;
+    return $$DepartmentTableTableManager(_db, _db.department)
+        .filter((f) => f.id(product.department!));
+  }
+
+  $$ListingTableProcessedTableManager get listings {
+    return $$ListingTableTableManager(_db, _db.listing)
+        .filter((f) => f.product.id(product.id));
+  }
+}
+
 typedef $$StoreTableInsertCompanionBuilder = StoreCompanion Function({
   Value<int> id,
   Value<String?> name,
@@ -4723,7 +4873,8 @@ class $$StoreTableTableManager extends RootTableManager<
     $$StoreTableOrderingComposer,
     $$StoreTableProcessedTableManager,
     $$StoreTableInsertCompanionBuilder,
-    $$StoreTableUpdateCompanionBuilder> {
+    $$StoreTableUpdateCompanionBuilder,
+    $$StoreTableWithReferences> {
   $$StoreTableTableManager(_$TodoDb db, $StoreTable table)
       : super(TableManagerState(
           db: db,
@@ -4741,6 +4892,8 @@ class $$StoreTableTableManager extends RootTableManager<
             id: id,
             name: name,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$StoreTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -4760,7 +4913,8 @@ class $$StoreTableProcessedTableManager extends ProcessedTableManager<
     $$StoreTableOrderingComposer,
     $$StoreTableProcessedTableManager,
     $$StoreTableInsertCompanionBuilder,
-    $$StoreTableUpdateCompanionBuilder> {
+    $$StoreTableUpdateCompanionBuilder,
+    $$StoreTableWithReferences> {
   $$StoreTableProcessedTableManager(super.$state);
 }
 
@@ -4804,6 +4958,18 @@ class $$StoreTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$StoreTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final StoreData store;
+  $$StoreTableWithReferences(this._db, this.store);
+
+  $$ListingTableProcessedTableManager get listings {
+    return $$ListingTableTableManager(_db, _db.listing)
+        .filter((f) => f.store.id(store.id));
+  }
+}
+
 typedef $$ListingTableInsertCompanionBuilder = ListingCompanion Function({
   Value<int> id,
   Value<int?> product,
@@ -4825,7 +4991,8 @@ class $$ListingTableTableManager extends RootTableManager<
     $$ListingTableOrderingComposer,
     $$ListingTableProcessedTableManager,
     $$ListingTableInsertCompanionBuilder,
-    $$ListingTableUpdateCompanionBuilder> {
+    $$ListingTableUpdateCompanionBuilder,
+    $$ListingTableWithReferences> {
   $$ListingTableTableManager(_$TodoDb db, $ListingTable table)
       : super(TableManagerState(
           db: db,
@@ -4847,6 +5014,8 @@ class $$ListingTableTableManager extends RootTableManager<
             store: store,
             price: price,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$ListingTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<int?> product = const Value.absent(),
@@ -4870,7 +5039,8 @@ class $$ListingTableProcessedTableManager extends ProcessedTableManager<
     $$ListingTableOrderingComposer,
     $$ListingTableProcessedTableManager,
     $$ListingTableInsertCompanionBuilder,
-    $$ListingTableUpdateCompanionBuilder> {
+    $$ListingTableUpdateCompanionBuilder,
+    $$ListingTableWithReferences> {
   $$ListingTableProcessedTableManager(super.$state);
 }
 
@@ -4950,6 +5120,25 @@ class $$ListingTableOrderingComposer
   }
 }
 
+class $$ListingTableWithReferences {
+  // ignore: unused_field
+  final _$TodoDb _db;
+  final ListingData listing;
+  $$ListingTableWithReferences(this._db, this.listing);
+
+  $$ProductTableProcessedTableManager? get product {
+    if (listing.product == null) return null;
+    return $$ProductTableTableManager(_db, _db.product)
+        .filter((f) => f.id(listing.product!));
+  }
+
+  $$StoreTableProcessedTableManager? get store {
+    if (listing.store == null) return null;
+    return $$StoreTableTableManager(_db, _db.store)
+        .filter((f) => f.id(listing.store!));
+  }
+}
+
 class $TodoDbManager {
   final _$TodoDb _db;
   $TodoDbManager(this._db);
@@ -4985,7 +5174,7 @@ class AllTodosWithCategoryResult extends CustomResultSet {
   final String? title;
   final String content;
   final DateTime? targetDate;
-  final int? category;
+  final RowId? category;
   final TodoStatus? status;
   final RowId catId;
   final String catDesc;

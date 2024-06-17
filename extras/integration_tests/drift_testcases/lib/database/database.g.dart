@@ -199,6 +199,19 @@ class User extends DataClass implements Insertable<User> {
             profilePicture.present ? profilePicture.value : this.profilePicture,
         preferences: preferences.present ? preferences.value : this.preferences,
       );
+  User copyWithCompanion(UsersCompanion data) {
+    return User(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      birthDate: data.birthDate.present ? data.birthDate.value : this.birthDate,
+      profilePicture: data.profilePicture.present
+          ? data.profilePicture.value
+          : this.profilePicture,
+      preferences:
+          data.preferences.present ? data.preferences.value : this.preferences,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('User(')
@@ -457,6 +470,17 @@ class Friendship extends DataClass implements Insertable<Friendship> {
         secondUser: secondUser ?? this.secondUser,
         reallyGoodFriends: reallyGoodFriends ?? this.reallyGoodFriends,
       );
+  Friendship copyWithCompanion(FriendshipsCompanion data) {
+    return Friendship(
+      firstUser: data.firstUser.present ? data.firstUser.value : this.firstUser,
+      secondUser:
+          data.secondUser.present ? data.secondUser.value : this.secondUser,
+      reallyGoodFriends: data.reallyGoodFriends.present
+          ? data.reallyGoodFriends.value
+          : this.reallyGoodFriends,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Friendship(')
@@ -717,7 +741,8 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableTableManager(_$Database db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -741,6 +766,8 @@ class $$UsersTableTableManager extends RootTableManager<
             profilePicture: profilePicture,
             preferences: preferences,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$UsersTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required String name,
@@ -766,7 +793,8 @@ class $$UsersTableProcessedTableManager extends ProcessedTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableProcessedTableManager(super.$state);
 }
 
@@ -830,6 +858,13 @@ class $$UsersTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$UsersTableWithReferences {
+  // ignore: unused_field
+  final _$Database _db;
+  final User users;
+  $$UsersTableWithReferences(this._db, this.users);
+}
+
 typedef $$FriendshipsTableInsertCompanionBuilder = FriendshipsCompanion
     Function({
   required int firstUser,
@@ -853,7 +888,8 @@ class $$FriendshipsTableTableManager extends RootTableManager<
     $$FriendshipsTableOrderingComposer,
     $$FriendshipsTableProcessedTableManager,
     $$FriendshipsTableInsertCompanionBuilder,
-    $$FriendshipsTableUpdateCompanionBuilder> {
+    $$FriendshipsTableUpdateCompanionBuilder,
+    $$FriendshipsTableWithReferences> {
   $$FriendshipsTableTableManager(_$Database db, $FriendshipsTable table)
       : super(TableManagerState(
           db: db,
@@ -876,6 +912,8 @@ class $$FriendshipsTableTableManager extends RootTableManager<
             reallyGoodFriends: reallyGoodFriends,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$FriendshipsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required int firstUser,
             required int secondUser,
@@ -899,7 +937,8 @@ class $$FriendshipsTableProcessedTableManager extends ProcessedTableManager<
     $$FriendshipsTableOrderingComposer,
     $$FriendshipsTableProcessedTableManager,
     $$FriendshipsTableInsertCompanionBuilder,
-    $$FriendshipsTableUpdateCompanionBuilder> {
+    $$FriendshipsTableUpdateCompanionBuilder,
+    $$FriendshipsTableWithReferences> {
   $$FriendshipsTableProcessedTableManager(super.$state);
 }
 
@@ -939,6 +978,13 @@ class $$FriendshipsTableOrderingComposer
       column: $state.table.reallyGoodFriends,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$FriendshipsTableWithReferences {
+  // ignore: unused_field
+  final _$Database _db;
+  final Friendship friendships;
+  $$FriendshipsTableWithReferences(this._db, this.friendships);
 }
 
 class $DatabaseManager {

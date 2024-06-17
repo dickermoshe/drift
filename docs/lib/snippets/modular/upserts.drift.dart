@@ -213,7 +213,8 @@ class $$WordsTableTableManager extends i0.RootTableManager<
     i1.$$WordsTableOrderingComposer,
     $$WordsTableProcessedTableManager,
     $$WordsTableInsertCompanionBuilder,
-    $$WordsTableUpdateCompanionBuilder> {
+    $$WordsTableUpdateCompanionBuilder,
+    $$WordsTableWithReferences> {
   $$WordsTableTableManager(i0.GeneratedDatabase db, i1.$WordsTable table)
       : super(i0.TableManagerState(
           db: db,
@@ -233,6 +234,8 @@ class $$WordsTableTableManager extends i0.RootTableManager<
             usages: usages,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$WordsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required String word,
             i0.Value<int> usages = const i0.Value.absent(),
@@ -254,7 +257,8 @@ class $$WordsTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$WordsTableOrderingComposer,
     $$WordsTableProcessedTableManager,
     $$WordsTableInsertCompanionBuilder,
-    $$WordsTableUpdateCompanionBuilder> {
+    $$WordsTableUpdateCompanionBuilder,
+    $$WordsTableWithReferences> {
   $$WordsTableProcessedTableManager(super.$state);
 }
 
@@ -284,6 +288,13 @@ class $$WordsTableOrderingComposer
       column: $state.table.usages,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$WordsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Word words;
+  $$WordsTableWithReferences(this._db, this.words);
 }
 
 class $MatchResultsTable extends i2.MatchResults
@@ -576,7 +587,8 @@ class $$MatchResultsTableTableManager extends i0.RootTableManager<
     i1.$$MatchResultsTableOrderingComposer,
     $$MatchResultsTableProcessedTableManager,
     $$MatchResultsTableInsertCompanionBuilder,
-    $$MatchResultsTableUpdateCompanionBuilder> {
+    $$MatchResultsTableUpdateCompanionBuilder,
+    $$MatchResultsTableWithReferences> {
   $$MatchResultsTableTableManager(
       i0.GeneratedDatabase db, i1.$MatchResultsTable table)
       : super(i0.TableManagerState(
@@ -600,6 +612,8 @@ class $$MatchResultsTableTableManager extends i0.RootTableManager<
             teamB: teamB,
             teamAWon: teamAWon,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$MatchResultsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String teamA,
@@ -623,7 +637,8 @@ class $$MatchResultsTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$MatchResultsTableOrderingComposer,
     $$MatchResultsTableProcessedTableManager,
     $$MatchResultsTableInsertCompanionBuilder,
-    $$MatchResultsTableUpdateCompanionBuilder> {
+    $$MatchResultsTableUpdateCompanionBuilder,
+    $$MatchResultsTableWithReferences> {
   $$MatchResultsTableProcessedTableManager(super.$state);
 }
 
@@ -673,4 +688,11 @@ class $$MatchResultsTableOrderingComposer
       column: $state.table.teamAWon,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$MatchResultsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.MatchResult matchResults;
+  $$MatchResultsTableWithReferences(this._db, this.matchResults);
 }

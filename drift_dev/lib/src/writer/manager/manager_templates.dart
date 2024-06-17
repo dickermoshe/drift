@@ -388,11 +388,17 @@ class _ManagerCodeTemplates {
     return """
 
         class ${rowClassWithReferencesName(currentTable)} {
+        // ignore: unused_field
         final ${databaseType(leaf, dbClassName)} _db;
         final ${rowClassWithPrefix(currentTable, leaf)} ${currentTable.dbGetterName};
         ${rowClassWithReferencesName(currentTable)}(this._db, this.${currentTable.dbGetterName});
 
         ${relations.map((relation) {
+      if (_scope.generationOptions.isModular) {
+        /// There is no support for references in modular generation
+        /// so we just return an empty getter
+        return "";
+      }
       if (relation.isReverse) {
         // For a reverse relation, we return a filtered table manager
         return """
@@ -402,16 +408,13 @@ class _ManagerCodeTemplates {
         """;
       } else {
         return """
-Future<${rowClassWithPrefix(relation.referencedTable, leaf)}?> get ${relation.fieldName} async {
-  if (${currentTable.dbGetterName}.${relation.currentColumn.nameInDart} == null) return null;
-  return await ${rootTableManagerWithPrefix(relation.referencedTable, leaf)}(_db, _db.${relation.referencedTable.dbGetterName}).filter((f) => f.${relation.referencedColumn.nameInDart}(${currentTable.dbGetterName}.${relation.currentColumn.nameInDart}!)).getSingleOrNull();
-}
-
-""";
+        ${processedTableManagerName(relation.referencedTable)}? get ${relation.fieldName} {
+          if (${currentTable.dbGetterName}.${relation.currentColumn.nameInDart} == null) return null;
+          return ${rootTableManagerWithPrefix(relation.referencedTable, leaf)}(_db, _db.${relation.referencedTable.dbGetterName}).filter((f) => f.${relation.referencedColumn.nameInDart}(${currentTable.dbGetterName}.${relation.currentColumn.nameInDart}!));
+        }
+        """;
       }
     }).join('\n')}
-
-
         }""";
   }
 }

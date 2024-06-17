@@ -149,6 +149,14 @@ class ActiveSession extends i0.DataClass
         user: user ?? this.user,
         bearerToken: bearerToken ?? this.bearerToken,
       );
+  ActiveSession copyWithCompanion(i3.ActiveSessionsCompanion data) {
+    return ActiveSession(
+      user: data.user.present ? data.user.value : this.user,
+      bearerToken:
+          data.bearerToken.present ? data.bearerToken.value : this.bearerToken,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ActiveSession(')
@@ -253,7 +261,8 @@ class $$ActiveSessionsTableTableManager extends i0.RootTableManager<
     i3.$$ActiveSessionsTableOrderingComposer,
     $$ActiveSessionsTableProcessedTableManager,
     $$ActiveSessionsTableInsertCompanionBuilder,
-    $$ActiveSessionsTableUpdateCompanionBuilder> {
+    $$ActiveSessionsTableUpdateCompanionBuilder,
+    $$ActiveSessionsTableWithReferences> {
   $$ActiveSessionsTableTableManager(
       i0.GeneratedDatabase db, i3.$ActiveSessionsTable table)
       : super(i0.TableManagerState(
@@ -275,6 +284,9 @@ class $$ActiveSessionsTableTableManager extends i0.RootTableManager<
             bearerToken: bearerToken,
             rowid: rowid,
           ),
+          withReferences: (p0) async => p0
+              .map((e) => $$ActiveSessionsTableWithReferences(db, e))
+              .toList(),
           getInsertCompanionBuilder: ({
             required int user,
             required String bearerToken,
@@ -297,7 +309,8 @@ class $$ActiveSessionsTableProcessedTableManager
         i3.$$ActiveSessionsTableOrderingComposer,
         $$ActiveSessionsTableProcessedTableManager,
         $$ActiveSessionsTableInsertCompanionBuilder,
-        $$ActiveSessionsTableUpdateCompanionBuilder> {
+        $$ActiveSessionsTableUpdateCompanionBuilder,
+        $$ActiveSessionsTableWithReferences> {
   $$ActiveSessionsTableProcessedTableManager(super.$state);
 }
 
@@ -351,4 +364,11 @@ class $$ActiveSessionsTableOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $$ActiveSessionsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i3.ActiveSession activeSessions;
+  $$ActiveSessionsTableWithReferences(this._db, this.activeSessions);
 }

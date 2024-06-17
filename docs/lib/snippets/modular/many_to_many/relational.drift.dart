@@ -199,7 +199,8 @@ class $$ShoppingCartsTableTableManager extends i0.RootTableManager<
     i2.$$ShoppingCartsTableOrderingComposer,
     $$ShoppingCartsTableProcessedTableManager,
     $$ShoppingCartsTableInsertCompanionBuilder,
-    $$ShoppingCartsTableUpdateCompanionBuilder> {
+    $$ShoppingCartsTableUpdateCompanionBuilder,
+    $$ShoppingCartsTableWithReferences> {
   $$ShoppingCartsTableTableManager(
       i0.GeneratedDatabase db, i2.$ShoppingCartsTable table)
       : super(i0.TableManagerState(
@@ -217,6 +218,8 @@ class $$ShoppingCartsTableTableManager extends i0.RootTableManager<
               i2.ShoppingCartsCompanion(
             id: id,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$ShoppingCartsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
           }) =>
@@ -235,7 +238,8 @@ class $$ShoppingCartsTableProcessedTableManager
         i2.$$ShoppingCartsTableOrderingComposer,
         $$ShoppingCartsTableProcessedTableManager,
         $$ShoppingCartsTableInsertCompanionBuilder,
-        $$ShoppingCartsTableUpdateCompanionBuilder> {
+        $$ShoppingCartsTableUpdateCompanionBuilder,
+        $$ShoppingCartsTableWithReferences> {
   $$ShoppingCartsTableProcessedTableManager(super.$state);
 }
 
@@ -255,6 +259,13 @@ class $$ShoppingCartsTableOrderingComposer
       column: $state.table.id,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$ShoppingCartsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i2.ShoppingCart shoppingCarts;
+  $$ShoppingCartsTableWithReferences(this._db, this.shoppingCarts);
 }
 
 class $ShoppingCartEntriesTable extends i3.ShoppingCartEntries
@@ -486,7 +497,8 @@ class $$ShoppingCartEntriesTableTableManager extends i0.RootTableManager<
     i2.$$ShoppingCartEntriesTableOrderingComposer,
     $$ShoppingCartEntriesTableProcessedTableManager,
     $$ShoppingCartEntriesTableInsertCompanionBuilder,
-    $$ShoppingCartEntriesTableUpdateCompanionBuilder> {
+    $$ShoppingCartEntriesTableUpdateCompanionBuilder,
+    $$ShoppingCartEntriesTableWithReferences> {
   $$ShoppingCartEntriesTableTableManager(
       i0.GeneratedDatabase db, i2.$ShoppingCartEntriesTable table)
       : super(i0.TableManagerState(
@@ -508,6 +520,9 @@ class $$ShoppingCartEntriesTableTableManager extends i0.RootTableManager<
             item: item,
             rowid: rowid,
           ),
+          withReferences: (p0) async => p0
+              .map((e) => $$ShoppingCartEntriesTableWithReferences(db, e))
+              .toList(),
           getInsertCompanionBuilder: ({
             required int shoppingCart,
             required int item,
@@ -530,7 +545,8 @@ class $$ShoppingCartEntriesTableProcessedTableManager
         i2.$$ShoppingCartEntriesTableOrderingComposer,
         $$ShoppingCartEntriesTableProcessedTableManager,
         $$ShoppingCartEntriesTableInsertCompanionBuilder,
-        $$ShoppingCartEntriesTableUpdateCompanionBuilder> {
+        $$ShoppingCartEntriesTableUpdateCompanionBuilder,
+        $$ShoppingCartEntriesTableWithReferences> {
   $$ShoppingCartEntriesTableProcessedTableManager(super.$state);
 }
 
@@ -614,4 +630,11 @@ class $$ShoppingCartEntriesTableOrderingComposer extends i0
                     parentComposers)));
     return composer;
   }
+}
+
+class $$ShoppingCartEntriesTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i2.ShoppingCartEntry shoppingCartEntries;
+  $$ShoppingCartEntriesTableWithReferences(this._db, this.shoppingCartEntries);
 }

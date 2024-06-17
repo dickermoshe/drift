@@ -478,6 +478,8 @@ abstract class BaseTableManager<
   Stream<DT?> watchSingleOrNull({bool distinct = true}) =>
       watch(distinct: distinct).transform(singleElementsOrNull());
 
+  /// Returns a class that provides access to the results of this query
+  /// along with the references that are defined in the database
   SelectableWithMapper<DtWithReferences, DT> withReferences(
       {bool distinct = false, int? limit, int? offset}) {
     return SelectableWithMapper(

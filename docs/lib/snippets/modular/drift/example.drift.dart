@@ -289,7 +289,8 @@ class $TodosTableManager extends i0.RootTableManager<
     i1.$TodosOrderingComposer,
     $TodosProcessedTableManager,
     $TodosInsertCompanionBuilder,
-    $TodosUpdateCompanionBuilder> {
+    $TodosUpdateCompanionBuilder,
+    $TodosWithReferences> {
   $TodosTableManager(i0.GeneratedDatabase db, i1.Todos table)
       : super(i0.TableManagerState(
           db: db,
@@ -311,6 +312,8 @@ class $TodosTableManager extends i0.RootTableManager<
             content: content,
             category: category,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $TodosWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String title,
@@ -334,7 +337,8 @@ class $TodosProcessedTableManager extends i0.ProcessedTableManager<
     i1.$TodosOrderingComposer,
     $TodosProcessedTableManager,
     $TodosInsertCompanionBuilder,
-    $TodosUpdateCompanionBuilder> {
+    $TodosUpdateCompanionBuilder,
+    $TodosWithReferences> {
   $TodosProcessedTableManager(super.$state);
 }
 
@@ -408,6 +412,13 @@ class $TodosOrderingComposer
                 parentComposers)));
     return composer;
   }
+}
+
+class $TodosWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Todo todos;
+  $TodosWithReferences(this._db, this.todos);
 }
 
 class Categories extends i0.Table with i0.TableInfo<Categories, i1.Category> {
@@ -612,7 +623,8 @@ class $CategoriesTableManager extends i0.RootTableManager<
     i1.$CategoriesOrderingComposer,
     $CategoriesProcessedTableManager,
     $CategoriesInsertCompanionBuilder,
-    $CategoriesUpdateCompanionBuilder> {
+    $CategoriesUpdateCompanionBuilder,
+    $CategoriesWithReferences> {
   $CategoriesTableManager(i0.GeneratedDatabase db, i1.Categories table)
       : super(i0.TableManagerState(
           db: db,
@@ -630,6 +642,8 @@ class $CategoriesTableManager extends i0.RootTableManager<
             id: id,
             description: description,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $CategoriesWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String description,
@@ -649,7 +663,8 @@ class $CategoriesProcessedTableManager extends i0.ProcessedTableManager<
     i1.$CategoriesOrderingComposer,
     $CategoriesProcessedTableManager,
     $CategoriesInsertCompanionBuilder,
-    $CategoriesUpdateCompanionBuilder> {
+    $CategoriesUpdateCompanionBuilder,
+    $CategoriesWithReferences> {
   $CategoriesProcessedTableManager(super.$state);
 }
 
@@ -679,6 +694,13 @@ class $CategoriesOrderingComposer
       column: $state.table.description,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $CategoriesWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.Category categories;
+  $CategoriesWithReferences(this._db, this.categories);
 }
 
 class ExampleDrift extends i2.ModularAccessor {

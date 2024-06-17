@@ -249,7 +249,8 @@ class $$BuyableItemsTableTableManager extends i0.RootTableManager<
     i1.$$BuyableItemsTableOrderingComposer,
     $$BuyableItemsTableProcessedTableManager,
     $$BuyableItemsTableInsertCompanionBuilder,
-    $$BuyableItemsTableUpdateCompanionBuilder> {
+    $$BuyableItemsTableUpdateCompanionBuilder,
+    $$BuyableItemsTableWithReferences> {
   $$BuyableItemsTableTableManager(
       i0.GeneratedDatabase db, i1.$BuyableItemsTable table)
       : super(i0.TableManagerState(
@@ -271,6 +272,8 @@ class $$BuyableItemsTableTableManager extends i0.RootTableManager<
             description: description,
             price: price,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$BuyableItemsTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             i0.Value<int> id = const i0.Value.absent(),
             required String description,
@@ -292,7 +295,8 @@ class $$BuyableItemsTableProcessedTableManager extends i0.ProcessedTableManager<
     i1.$$BuyableItemsTableOrderingComposer,
     $$BuyableItemsTableProcessedTableManager,
     $$BuyableItemsTableInsertCompanionBuilder,
-    $$BuyableItemsTableUpdateCompanionBuilder> {
+    $$BuyableItemsTableUpdateCompanionBuilder,
+    $$BuyableItemsTableWithReferences> {
   $$BuyableItemsTableProcessedTableManager(super.$state);
 }
 
@@ -332,4 +336,11 @@ class $$BuyableItemsTableOrderingComposer
       column: $state.table.price,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $$BuyableItemsTableWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.BuyableItem buyableItems;
+  $$BuyableItemsTableWithReferences(this._db, this.buyableItems);
 }

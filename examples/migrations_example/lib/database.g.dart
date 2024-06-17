@@ -162,6 +162,15 @@ class User extends DataClass implements Insertable<User> {
         birthday: birthday.present ? birthday.value : this.birthday,
         nextUser: nextUser.present ? nextUser.value : this.nextUser,
       );
+  User copyWithCompanion(UsersCompanion data) {
+    return User(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      birthday: data.birthday.present ? data.birthday.value : this.birthday,
+      nextUser: data.nextUser.present ? data.nextUser.value : this.nextUser,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('User(')
@@ -417,6 +426,15 @@ class Group extends DataClass implements Insertable<Group> {
         deleted: deleted.present ? deleted.value : this.deleted,
         owner: owner ?? this.owner,
       );
+  Group copyWithCompanion(GroupsCompanion data) {
+    return Group(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      owner: data.owner.present ? data.owner.value : this.owner,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Group(')
@@ -650,6 +668,15 @@ class Note extends DataClass implements Insertable<Note> {
         content: content ?? this.content,
         searchTerms: searchTerms ?? this.searchTerms,
       );
+  Note copyWithCompanion(NotesCompanion data) {
+    return Note(
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+      searchTerms:
+          data.searchTerms.present ? data.searchTerms.value : this.searchTerms,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Note(')
@@ -923,7 +950,8 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableTableManager(_$Database db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -945,6 +973,8 @@ class $$UsersTableTableManager extends RootTableManager<
             birthday: birthday,
             nextUser: nextUser,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $$UsersTableWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
@@ -968,7 +998,8 @@ class $$UsersTableProcessedTableManager extends ProcessedTableManager<
     $$UsersTableOrderingComposer,
     $$UsersTableProcessedTableManager,
     $$UsersTableInsertCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder> {
+    $$UsersTableUpdateCompanionBuilder,
+    $$UsersTableWithReferences> {
   $$UsersTableProcessedTableManager(super.$state);
 }
 
@@ -1047,6 +1078,24 @@ class $$UsersTableOrderingComposer
   }
 }
 
+class $$UsersTableWithReferences {
+  // ignore: unused_field
+  final _$Database _db;
+  final User users;
+  $$UsersTableWithReferences(this._db, this.users);
+
+  $$UsersTableProcessedTableManager? get nextUser {
+    if (users.nextUser == null) return null;
+    return $$UsersTableTableManager(_db, _db.users)
+        .filter((f) => f.id(users.nextUser!));
+  }
+
+  $GroupsProcessedTableManager get groupsRefs {
+    return $GroupsTableManager(_db, _db.groups)
+        .filter((f) => f.owner.id(users.id));
+  }
+}
+
 typedef $GroupsInsertCompanionBuilder = GroupsCompanion Function({
   Value<int> id,
   required String title,
@@ -1068,7 +1117,8 @@ class $GroupsTableManager extends RootTableManager<
     $GroupsOrderingComposer,
     $GroupsProcessedTableManager,
     $GroupsInsertCompanionBuilder,
-    $GroupsUpdateCompanionBuilder> {
+    $GroupsUpdateCompanionBuilder,
+    $GroupsWithReferences> {
   $GroupsTableManager(_$Database db, Groups table)
       : super(TableManagerState(
           db: db,
@@ -1088,6 +1138,8 @@ class $GroupsTableManager extends RootTableManager<
             deleted: deleted,
             owner: owner,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $GroupsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required String title,
@@ -1111,7 +1163,8 @@ class $GroupsProcessedTableManager extends ProcessedTableManager<
     $GroupsOrderingComposer,
     $GroupsProcessedTableManager,
     $GroupsInsertCompanionBuilder,
-    $GroupsUpdateCompanionBuilder> {
+    $GroupsUpdateCompanionBuilder,
+    $GroupsWithReferences> {
   $GroupsProcessedTableManager(super.$state);
 }
 
@@ -1175,6 +1228,19 @@ class $GroupsOrderingComposer extends OrderingComposer<_$Database, Groups> {
   }
 }
 
+class $GroupsWithReferences {
+  // ignore: unused_field
+  final _$Database _db;
+  final Group groups;
+  $GroupsWithReferences(this._db, this.groups);
+
+  $$UsersTableProcessedTableManager? get owner {
+    if (groups.owner == null) return null;
+    return $$UsersTableTableManager(_db, _db.users)
+        .filter((f) => f.id(groups.owner!));
+  }
+}
+
 typedef $NotesInsertCompanionBuilder = NotesCompanion Function({
   required String title,
   required String content,
@@ -1196,7 +1262,8 @@ class $NotesTableManager extends RootTableManager<
     $NotesOrderingComposer,
     $NotesProcessedTableManager,
     $NotesInsertCompanionBuilder,
-    $NotesUpdateCompanionBuilder> {
+    $NotesUpdateCompanionBuilder,
+    $NotesWithReferences> {
   $NotesTableManager(_$Database db, Notes table)
       : super(TableManagerState(
           db: db,
@@ -1216,6 +1283,8 @@ class $NotesTableManager extends RootTableManager<
             searchTerms: searchTerms,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $NotesWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required String title,
             required String content,
@@ -1239,7 +1308,8 @@ class $NotesProcessedTableManager extends ProcessedTableManager<
     $NotesOrderingComposer,
     $NotesProcessedTableManager,
     $NotesInsertCompanionBuilder,
-    $NotesUpdateCompanionBuilder> {
+    $NotesUpdateCompanionBuilder,
+    $NotesWithReferences> {
   $NotesProcessedTableManager(super.$state);
 }
 
@@ -1277,6 +1347,13 @@ class $NotesOrderingComposer extends OrderingComposer<_$Database, Notes> {
       column: $state.table.searchTerms,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $NotesWithReferences {
+  // ignore: unused_field
+  final _$Database _db;
+  final Note notes;
+  $NotesWithReferences(this._db, this.notes);
 }
 
 class $DatabaseManager {

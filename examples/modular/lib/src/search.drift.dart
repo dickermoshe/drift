@@ -232,7 +232,8 @@ class $SearchInPostsTableManager extends i0.RootTableManager<
     i1.$SearchInPostsOrderingComposer,
     $SearchInPostsProcessedTableManager,
     $SearchInPostsInsertCompanionBuilder,
-    $SearchInPostsUpdateCompanionBuilder> {
+    $SearchInPostsUpdateCompanionBuilder,
+    $SearchInPostsWithReferences> {
   $SearchInPostsTableManager(i0.GeneratedDatabase db, i1.SearchInPosts table)
       : super(i0.TableManagerState(
           db: db,
@@ -252,6 +253,8 @@ class $SearchInPostsTableManager extends i0.RootTableManager<
             content: content,
             rowid: rowid,
           ),
+          withReferences: (p0) async =>
+              p0.map((e) => $SearchInPostsWithReferences(db, e)).toList(),
           getInsertCompanionBuilder: ({
             required String author,
             required String content,
@@ -273,7 +276,8 @@ class $SearchInPostsProcessedTableManager extends i0.ProcessedTableManager<
     i1.$SearchInPostsOrderingComposer,
     $SearchInPostsProcessedTableManager,
     $SearchInPostsInsertCompanionBuilder,
-    $SearchInPostsUpdateCompanionBuilder> {
+    $SearchInPostsUpdateCompanionBuilder,
+    $SearchInPostsWithReferences> {
   $SearchInPostsProcessedTableManager(super.$state);
 }
 
@@ -303,6 +307,13 @@ class $SearchInPostsOrderingComposer
       column: $state.table.content,
       builder: (column, joinBuilders) =>
           i0.ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $SearchInPostsWithReferences {
+  // ignore: unused_field
+  final i0.GeneratedDatabase _db;
+  final i1.SearchInPost searchInPosts;
+  $SearchInPostsWithReferences(this._db, this.searchInPosts);
 }
 
 i0.Trigger get postsInsert => i0.Trigger(
