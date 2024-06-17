@@ -361,7 +361,7 @@ void main() {
         description: categoryData[1].description));
 
     final todoData = <({
-      Value<int> category,
+      Value<RowId> category,
       String content,
       Value<TodoStatus> status,
       Value<DateTime> targetDate,
@@ -371,28 +371,28 @@ void main() {
       (
         content: "Get that math homework done",
         title: Value("Math Homework"),
-        category: Value(schoolCategoryId),
+        category: Value(RowId(schoolCategoryId)),
         status: Value(TodoStatus.open),
         targetDate: Value(DateTime.now().add(Duration(days: 1, seconds: 10)))
       ),
       (
         content: "Finish that report",
         title: Value("Report"),
-        category: Value(schoolCategoryId),
+        category: Value(RowId(schoolCategoryId)),
         status: Value(TodoStatus.workInProgress),
         targetDate: Value(DateTime.now().add(Duration(days: 2, seconds: 10)))
       ),
       (
         content: "Get that english homework done",
         title: Value("English Homework"),
-        category: Value(schoolCategoryId),
+        category: Value(RowId(schoolCategoryId)),
         status: Value(TodoStatus.open),
         targetDate: Value(DateTime.now().add(Duration(days: 1, seconds: 15)))
       ),
       (
         content: "Finish that Book report",
         title: Value("Book Report"),
-        category: Value(schoolCategoryId),
+        category: Value(RowId(schoolCategoryId)),
         status: Value(TodoStatus.done),
         targetDate:
             Value(DateTime.now().subtract(Duration(days: 2, seconds: 15)))
@@ -401,28 +401,28 @@ void main() {
       (
         content: "File those reports",
         title: Value("File Reports"),
-        category: Value(workCategoryId),
+        category: Value(RowId(workCategoryId)),
         status: Value(TodoStatus.open),
         targetDate: Value(DateTime.now().add(Duration(days: 1, seconds: 20)))
       ),
       (
         content: "Clean the office",
         title: Value("Clean Office"),
-        category: Value(workCategoryId),
+        category: Value(RowId(workCategoryId)),
         status: Value(TodoStatus.workInProgress),
         targetDate: Value(DateTime.now().add(Duration(days: 2, seconds: 20)))
       ),
       (
         content: "Nail that presentation",
         title: Value("Presentation"),
-        category: Value(workCategoryId),
+        category: Value(RowId(workCategoryId)),
         status: Value(TodoStatus.open),
         targetDate: Value(DateTime.now().add(Duration(days: 1, seconds: 25)))
       ),
       (
         content: "Take a break",
         title: Value("Break"),
-        category: Value(workCategoryId),
+        category: Value(RowId(workCategoryId)),
         status: Value(TodoStatus.done),
         targetDate:
             Value(DateTime.now().subtract(Duration(days: 2, seconds: 25)))
@@ -448,7 +448,7 @@ void main() {
       await db.managers.todosTable.create((o) => o(
           content: i.content,
           title: i.title,
-          category: Value(RowId(i.category.value)),
+          category: i.category,
           status: i.status,
           targetDate: i.targetDate));
     }
