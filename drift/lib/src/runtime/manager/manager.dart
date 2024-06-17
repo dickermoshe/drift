@@ -480,6 +480,10 @@ abstract class BaseTableManager<
 
   /// Returns a class that provides access to the results of this query
   /// along with the references that are defined in the database
+  ///
+  /// Use [limit] and [offset] to limit the number of rows returned
+  /// An offset will only be applied if a limit is also set
+  /// Set [distinct] to true to ensure that only distinct rows are returned
   SelectableWithMapper<DtWithReferences, DT> withReferences(
       {bool distinct = false, int? limit, int? offset}) {
     return SelectableWithMapper(
